@@ -1,0 +1,11 @@
+[
+  {
+    "username": "Bui Hoan Hao",
+    "email": "admin1@gmail.com",
+    "password": "$2a$14$GXs3RG87A7KzdvBNupv3NO9wAA.Z4O222o2LNWcG3G5.RrCb0Xt6q",
+    "age": 21,
+    "phone": "0999999999",
+    "role": "Admin",
+    "account_id": "huhu1"
+  }
+]
