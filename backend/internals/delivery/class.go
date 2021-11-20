@@ -20,6 +20,7 @@ type ClassDelivery interface {
 	Update(w http.ResponseWriter, r *http.Request)
 	GetClassList(w http.ResponseWriter, r *http.Request)
 	GetClassById(w http.ResponseWriter, r *http.Request)
+	GetClassByAccountId(w http.ResponseWriter, r *http.Request)
 }
 
 type classDelivery struct {
@@ -122,13 +123,28 @@ func (d *classDelivery) GetClassList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d *classDelivery) GetClassById(w http.ResponseWriter, r *http.Request) {
-	ClassId := r.URL.Query()["ClassId"]
-	if len(ClassId) == 0 {
+	classId := r.URL.Query()["classId"]
+	if len(classId) == 0 {
 		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": "Invalid body"})
 		return
 	}
 
-	res, err := d.classDomain.GetClassById(context.Background(), ClassId[0])
+	res, err := d.classDomain.GetClassById(context.Background(), classId[0])
+	if err != nil {
+		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": err.Error()})
+		return
+	}
+	utils.ResponseWithJson(w, http.StatusOK, res)
+}
+
+func (d *classDelivery) GetClassByAccountId(w http.ResponseWriter, r *http.Request) {
+	accountId := r.URL.Query()["accountId"]
+	if len(accountId) == 0 {
+		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": "Invalid body"})
+		return
+	}
+
+	res, err := d.classDomain.GetClassByAccountID(context.Background(), accountId[0])
 	if err != nil {
 		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": err.Error()})
 		return

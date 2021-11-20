@@ -22,6 +22,8 @@ type Class interface {
 	GetClassList(ctx context.Context, offset, limit int64) ([]*models.Class, error)
 	GetClassById(ctx context.Context, classId string) (*models.Class, error)
 	GetClassByAccountID(ctx context.Context, accountID string) ([]*models.Class, error)
+	AddStudent(ctx context.Context, classId, studentId string) (*models.Class, error)
+	IsTeacher(ctx context.Context, teacherId, classId string) (bool, error)
 }
 
 type classDomain struct {
@@ -80,6 +82,23 @@ func (d *classDomain) Create(ctx context.Context, class *models.Class) (*models.
 	return res, nil
 }
 
+func (d *classDomain) AddStudent(ctx context.Context, classId, studentId string) (*models.Class, error) {
+	class, err := d.classRepository.GetClassById(ctx, classId)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := d.classRepository.Update(ctx, &models.Class{
+		ClassID:    class.ClassID,
+		StudentIDs: append(class.StudentIDs, studentId),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (d *classDomain) Update(ctx context.Context, class *models.Class) (*models.Class, error) {
 	res, err := d.classRepository.Update(ctx, class)
 	if err != nil {
@@ -98,8 +117,8 @@ func (d *classDomain) GetClassList(ctx context.Context, offset, limit int64) ([]
 	return res, nil
 }
 
-func (d *classDomain) GetClassById(ctx context.Context, ClassId string) (*models.Class, error) {
-	res, err := d.classRepository.GetClassById(ctx, ClassId)
+func (d *classDomain) GetClassById(ctx context.Context, classId string) (*models.Class, error) {
+	res, err := d.classRepository.GetClassById(ctx, classId)
 	if err != nil {
 		return nil, err
 	}
@@ -114,4 +133,13 @@ func (d *classDomain) GetClassByAccountID(ctx context.Context, accountID string)
 	}
 
 	return res, nil
+}
+
+func (d *classDomain) IsTeacher(ctx context.Context, teacherId, classId string) (bool, error) {
+	res, err := d.classRepository.GetClassById(ctx, classId)
+	if err != nil {
+		return false, err
+	}
+
+	return res.ClassID == classId, nil
 }
