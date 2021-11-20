@@ -1,54 +1,116 @@
 import React from "react";
-import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
 function Login() {
+  const validation = {
+    password: "",
+    confirmPassword: "",
+  }
 
+  const handleSubmit = (e) => {
+    const { password, confirmPassword } = validation;
+    if (password !== confirmPassword) {
+      alert("Passwords don't match");
+      e.preventDefault();
+    }
+    else if (password.length < 6) {
+      alert("Your password must be at least 6 characters long. Please try a different password.");
+      e.preventDefault();
+    }
+  }
 
+  return (
+    <div className="card mx-auto mt-5" style={{ width: "25%" }}>
+      <h1 className="card-header text-center">Register</h1>
+      <div className="card-body ">
+        <form className="row g-3 needs-validation">
+          
+          <div className="form-group">
+            <label htmlFor="registerFullname" className="form-label">
+              Fullname
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="registerFullname"
+              placeholder="Fullname"
+              required
+            />
+          </div>
 
-    return (
-        <div className="card mx-auto mt-5" style={{ width: '25%' }}>
-            <h1 className="card-header text-center">
-                Register
-            </h1>
+          <div className="form-group">
+            <label htmlFor="registerAccount">Account</label>
+            <input
+              type="text"
+              className="form-control"
+              id="registerAccount"
+              placeholder="Account"
+              required
+            />
+          </div>
 
-            <div className="card-body " >
-                <form>
-                    <div className="form-group">
-                        <label htmlFor="exampleInputEmail1">Account</label>
-                        <input
-                            type="email"
-                            className="form-control"
-                            id="exampleInputEmail1"
-                            aria-describedby="emailHelp"
-                            placeholder="Enter account"
-                        />
+          <div className="form-group">
+            <label htmlFor="registerPassword1">Password</label>
+            <input
+              type="password"
+              className="form-control"
+              id="registerPassword1"
+              placeholder="Password"
+              required
+              onChange={(e) => {
+                validation.password = e.target.value;
+              }}
+            />
+          </div>
 
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="exampleInputPassword1">Password</label>
-                        <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password" />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="exampleInputPassword1">Confirm Password</label>
-                        <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Confirm Password" />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="exampleInputPassword1">ID Student</label>
-                        <input type="password" className="form-control" id="exampleInputPassword1" placeholder="ID Student" />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="exampleInputPassword1">Gmail</label>
-                        <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Gmail" />
-                    </div>
+          <div className="form-group">
+            <label htmlFor="registerPassword2">Confirm password</label>
+            <input
+              type="password"
+              className="form-control"
+              id="registerPassword2"
+              placeholder="Confirm password"
+              required
+              onChange={(e) => {
+                validation.confirmPassword = e.target.value;
+              }}
+            />
+          </div>
 
-                    <div className='w-100' style={{ display: 'flex', justifyContent: 'center' }}>
-                        <button type="submit" className="btn btn-primary mt-3 px-5">Sign up</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    );
+          <div className="form-group">
+            <label htmlFor="registerID">ID student</label>
+            <input
+              type="text"
+              className="form-control"
+              id="registerID"
+              placeholder="ID student"
+              required
+            />
+          </div>
 
+          <div className="form-group">
+            <label htmlFor="registerGmail">Gmail</label>
+            <input
+              type="email"
+              className="form-control"
+              id="registerGmail"
+              placeholder="Gmail"
+              required
+            />
+          </div>
+
+          <div
+            className="w-100"
+            style={{ display: "flex", justifyContent: "center" }}
+          >
+            <button className="btn btn-primary" type="submit" onClick = {(e)=>{handleSubmit(e)}}>
+              Register
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 export default Login;

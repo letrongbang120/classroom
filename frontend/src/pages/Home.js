@@ -1,12 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-
 import "./Home.css";
 
 function Home() {
- 
-
   return (
     <div className="home">
       <div className="home__container ">
@@ -17,25 +14,14 @@ function Home() {
         />
 
         <Link to="/login">
-            <button className="home__login w-100" >
-            Sign in
-            </button>
-        </Link>
-        
-
-        <Link to="/register" className='w-100'>
-            <button className="home__login w-100" >
-            Sign up
-            </button>
+          <button className="home__login w-100">Sign in</button>
         </Link>
 
-        <button className="home__login " >
-          Sign in with Google
-        </button>
+        <Link to="/register" className="w-100">
+          <button className="home__login w-100">Sign up</button>
+        </Link>
       </div>
     </div>
-
-
   );
 }
 
