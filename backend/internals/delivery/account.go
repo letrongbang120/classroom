@@ -5,7 +5,6 @@ import (
 	"TKPM/internals/models"
 	"TKPM/utils"
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"net/http"
 )
@@ -85,6 +84,7 @@ func (d *accountDelivery) GetAccountById(w http.ResponseWriter, r *http.Request)
 		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": err.Error()})
 		return
 	}
+	res.Password = ""
 
 	utils.ResponseWithJson(w, http.StatusOK, res)
 }
@@ -95,15 +95,4 @@ func (d *accountDelivery) CheckAuth(accountId string) (*models.Account, error) {
 		return nil, err
 	}
 	return res, nil
-}
-
-func genToken(account *models.Account) string {
-
-	bytes, err := json.Marshal(account)
-	if err != nil {
-		return ""
-	}
-
-	token := base64.StdEncoding.EncodeToString(bytes)
-	return string(token)
 }

@@ -11,3 +11,7 @@ type Class struct {
 	StudentIDs  []string `json:"studentIds,omitempty" bson:"student_ids,omitempty"`
 	TeacherID   string   `json:"teacherId,omitempty" bson:"teacher_id,omitempty"`
 }
+
+type JoinClassRequest struct {
+	ClassID   string `json:"classId,omitempty" bson:"class_id,omitempty"`
+}
