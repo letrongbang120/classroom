@@ -1,30 +1,30 @@
 import React from "react";
-import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import "../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
 function Login() {
   const validation = {
     password: "",
     confirmPassword: "",
-  }
+  };
 
   const handleSubmit = (e) => {
     const { password, confirmPassword } = validation;
     if (password !== confirmPassword) {
       alert("Passwords don't match");
       e.preventDefault();
-    }
-    else if (password.length < 6) {
-      alert("Your password must be at least 6 characters long. Please try a different password.");
+    } else if (password.length < 6) {
+      alert(
+        "Your password must be at least 6 characters long. Please try a different password."
+      );
       e.preventDefault();
     }
-  }
+  };
 
   return (
     <div className="card mx-auto mt-5" style={{ width: "25%" }}>
       <h1 className="card-header text-center">Register</h1>
       <div className="card-body ">
         <form className="row g-3 needs-validation">
-          
           <div className="form-group">
             <label htmlFor="registerFullname" className="form-label">
               Fullname
@@ -103,7 +103,13 @@ function Login() {
             className="w-100"
             style={{ display: "flex", justifyContent: "center" }}
           >
-            <button className="btn btn-primary" type="submit" onClick = {(e)=>{handleSubmit(e)}}>
+            <button
+              className="btn btn-primary"
+              type="submit"
+              onClick={(e) => {
+                handleSubmit(e);
+              }}
+            >
               Register
             </button>
           </div>

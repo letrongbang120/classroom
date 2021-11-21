@@ -1,19 +1,30 @@
 import { Routes, Route } from "react-router-dom";
+import React from "react";
 
-
-import Home from './pages/Home'
-import Login from './components/Login'
-import Register from './components/Register'
+import Home from "./pages/Home/Home";
+import Login from "./components/Login/Login";
+import Register from "./components/Register/Register";
 import CoursePage from "./pages/CoursePage/CoursePage";
+import Navbar from "./components/Navbar/Navbar";
+import Dashboard from "./pages/Dashboard/Dashboard";
 
 function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
-        <Route path='/' element={<Home />} />
-        <Route path='/c/:courseId' element={<CoursePage />} />
+        <Route exact path="/login" element={<Login />} />
+        <Route exact path="/register" element={<Register />} />
+        <Route exact path="/" element={<Home />} />
+        <Route exact path="/c/:courseId" element={<CoursePage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <React.Fragment>
+              <Navbar />
+              <Dashboard />
+            </React.Fragment>
+          }
+        />
       </Routes>
     </div>
   );

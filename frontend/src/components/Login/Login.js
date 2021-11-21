@@ -1,5 +1,5 @@
 import React from "react";
-import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import "../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import { useForm } from "react-hook-form";
 import { GoogleLogin } from "react-google-login";
 
