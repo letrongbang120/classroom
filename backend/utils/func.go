@@ -15,3 +15,7 @@ func ResponseWithJson(writer http.ResponseWriter, status int, object interface{}
 func GetLink(classId string) string {
 	return consts.Host + "/" + classId
 }
+
+func GetInviteMessage(classId string) string {
+	return "Click this link to join classroom: " + GetLink(classId)
+}

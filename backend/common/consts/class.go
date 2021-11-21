@@ -1,3 +1,6 @@
 package consts
 
-var Host = "localhost:3000"
+const (
+	Host            = "http://localhost:3000"
+	SubjectToInvite = "Invite To Join Classroom"
+)

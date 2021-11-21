@@ -11,16 +11,19 @@ import (
 
 type InvitationDelivery interface {
 	GetLink(w http.ResponseWriter, r *http.Request)
+	InviteByEmail(w http.ResponseWriter, r *http.Request)
 	Join(w http.ResponseWriter, r *http.Request)
 }
 
 type invitationDelivery struct {
-	classDomain domain.Class
+	classDomain      domain.Class
+	invitationDomain domain.Invitation
 }
 
-func NewInvitationDelivery(classDomain domain.Class) InvitationDelivery {
+func NewInvitationDelivery(classDomain domain.Class, invitationDomain domain.Invitation) InvitationDelivery {
 	return &invitationDelivery{
-		classDomain: classDomain,
+		classDomain:      classDomain,
+		invitationDomain: invitationDomain,
 	}
 }
 
@@ -48,4 +51,19 @@ func (d *invitationDelivery) Join(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ResponseWithJson(w, http.StatusOK, res)
+}
+
+func (d *invitationDelivery) InviteByEmail(w http.ResponseWriter, r *http.Request) {
+	var data models.InviteByEmailRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		responseWithJson(w, http.StatusBadRequest, map[string]string{"message": "Invalid body"})
+		return
+	}
+	if err := d.invitationDomain.InviteByEmail(context.Background(), data.EmailList, data.ClassID); err != nil {
+		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": err.Error()})
+		return
+	}
+
+	utils.ResponseWithJson(w, http.StatusOK, map[string]string{"message": "invite successfull!!"})
 }

@@ -47,9 +47,11 @@ type srv struct {
 	mgoClientOptions *options.ClientOptions
 
 	authenticator token.Authenticator
+	mail          domain.Mail
 
-	classDomain   domain.Class
-	accountDomain domain.Account
+	classDomain      domain.Class
+	accountDomain    domain.Account
+	invitationDomain domain.Invitation
 
 	classDelivery      delivery.ClassDelivery
 	accountDelivery    delivery.AccountDelivery
@@ -135,6 +137,11 @@ func (s *srv) connectMongo() error {
 	return nil
 }
 
+func (s *srv) loadMailer() error {
+	s.mail = domain.NewMailer("go.normal.icontrol@gmail.com", "haopro123", "smtp.gmail.com", "587")
+	return nil
+}
+
 func (s *srv) loadTracing() error {
 	cfg := config.Configuration{
 		ServiceName: s.cfg.ServiceName,
@@ -164,6 +171,7 @@ func (s *srv) loadTracing() error {
 func (s *srv) loadDomain() error {
 	s.accountDomain = domain.NewAccountDomain(repository.NewAccountRepository(s.mgoDB.Collection(models.AccountCollection)), s.authenticator)
 	s.classDomain = domain.NewClassDomain(repository.NewClassRepository(s.mgoDB.Collection(models.ClassCollection)))
+	s.invitationDomain = domain.NewInvitationDomain(s.mail)
 	s.logger.Info("load domain successfull ")
 	return nil
 }
@@ -171,7 +179,7 @@ func (s *srv) loadDomain() error {
 func (s *srv) loadDelivery() error {
 	s.accountDelivery = delivery.NewAccountDelivery(s.accountDomain)
 	s.classDelivery = delivery.NewClassDelivery(s.classDomain, s.cfg.Storage)
-	s.invitationDelivery = delivery.NewInvitationDelivery(s.classDomain)
+	s.invitationDelivery = delivery.NewInvitationDelivery(s.classDomain, s.invitationDomain)
 	s.logger.Info("load delivery successfull ")
 	return nil
 }
@@ -218,6 +226,10 @@ func Start(ctx *cli.Context) error {
 	}
 
 	if err := server.connectMongo(); err != nil {
+		return err
+	}
+
+	if err := server.loadMailer(); err != nil {
 		return err
 	}
 
