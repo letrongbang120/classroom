@@ -9,8 +9,8 @@ function Login() {
   password.current = watch("password", "");
 
   const onSubmitHandler = (userInfo) => {
-    try {
-      const register = async () => {
+    const register = async () => {
+      try {
         const { data } = await axios.post("/sign-up", {
           email: userInfo.email,
           password: userInfo.password,
@@ -19,11 +19,11 @@ function Login() {
           age: userInfo.age
         });
         console.log(data);
-      };
-      register();
-    } catch (error) {
-      console.log(error.message);
-    }
+      } catch (error) {
+        console.log(error.message)
+      }
+    };
+    register();
   }
 
   return (
