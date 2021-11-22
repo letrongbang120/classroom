@@ -1,102 +1,144 @@
-import React from "react";
+import React, { useRef } from "react";
 import "../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import { useForm } from 'react-hook-form'
+import axios from 'axios'
 
 function Login() {
-  const validation = {
-    password: "",
-    confirmPassword: "",
-  };
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const password = useRef({});
+  password.current = watch("password", "");
 
-  const handleSubmit = (e) => {
-    const { password, confirmPassword } = validation;
-    if (password !== confirmPassword) {
-      alert("Passwords don't match");
-      e.preventDefault();
-    } else if (password.length < 6) {
-      alert(
-        "Your password must be at least 6 characters long. Please try a different password."
-      );
-      e.preventDefault();
+  const onSubmitHandler = (userInfo) => {
+    try {
+      const register = async () => {
+        const { data } = await axios.post("/sign-up", {
+          email: userInfo.email,
+          password: userInfo.password,
+          studentId: userInfo.studentId,
+          phone: userInfo.phoneNumber,
+          age: userInfo.age
+        });
+        console.log(data);
+      };
+      register();
+    } catch (error) {
+      console.log(error.message);
     }
-  };
+  }
 
   return (
     <div className="card mx-auto mt-5" style={{ width: "25%" }}>
       <h1 className="card-header text-center">Register</h1>
       <div className="card-body ">
-        <form className="row g-3 needs-validation">
+        <form
+          className="row g-3 needs-validation"
+          onSubmit={handleSubmit(onSubmitHandler)}>
           <div className="form-group">
-            <label htmlFor="registerFullname" className="form-label">
+            <label htmlFor="fullname" className="form-label">
               Fullname
             </label>
             <input
               type="text"
               className="form-control"
-              id="registerFullname"
+              id="fullname"
+              name="fullname"
               placeholder="Fullname"
-              required
+              {...register("fullname", { required: true })}
             />
+            {errors.fullname?.type === "required" && <span className="error">Fullname is required</span>}
           </div>
 
           <div className="form-group">
-            <label htmlFor="registerAccount">Account</label>
+            <label htmlFor="email">Email</label>
             <input
               type="text"
               className="form-control"
-              id="registerAccount"
-              placeholder="Account"
-              required
+              id="email"
+              name="email"
+              placeholder="Enter your email..."
+              {...register("email", {
+                required: true,
+                pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+              })}
             />
+            {errors.email?.type === "required" && (
+              <span className="error">Email is required</span>
+            )}
+            {errors.email?.type === "pattern" && (
+              <span className="error">Invalid entered email</span>
+            )}
           </div>
 
           <div className="form-group">
-            <label htmlFor="registerPassword1">Password</label>
+            <label htmlFor="password">Password</label>
             <input
               type="password"
               className="form-control"
-              id="registerPassword1"
-              placeholder="Password"
-              required
-              onChange={(e) => {
-                validation.password = e.target.value;
-              }}
+              id="password"
+              name="password"
+              placeholder="Enter password"
+              {...register("password", {
+                required: true,
+                minLength: 6
+              })}
             />
+            {errors.password?.type === "required" && <span className="error">Password is required</span>}
+            {errors.password?.type === "minLength" && <span className="error">Password has at least 6 characters</span>}
           </div>
 
           <div className="form-group">
-            <label htmlFor="registerPassword2">Confirm password</label>
+            <label htmlFor="confirmPassword">Confirm password</label>
             <input
               type="password"
               className="form-control"
-              id="registerPassword2"
+              id="confirmPassword"
+              name="confirmPassword"
               placeholder="Confirm password"
-              required
-              onChange={(e) => {
-                validation.confirmPassword = e.target.value;
-              }}
+              {...register("confirmPassword", {
+                required: true,
+                validate: value =>
+                  value === password.current || "Confirm password do not match"
+              })}
             />
+            {errors.confirmPassword?.message && <span className="error">{errors.confirmPassword.message}</span>}
+            {errors.confirmPassword?.type === "required" && <span className="error">Confirm password is required</span>}
           </div>
 
           <div className="form-group">
-            <label htmlFor="registerID">ID student</label>
+            <label htmlFor="studentId">ID student</label>
             <input
               type="text"
               className="form-control"
-              id="registerID"
+              id="studentId"
+              name="studentId"
               placeholder="ID student"
-              required
+              {...register("studentId", { required: true })}
             />
+            {errors.studentId?.type === "required" && <span className="error">StudentId is required</span>}
           </div>
 
           <div className="form-group">
-            <label htmlFor="registerGmail">Gmail</label>
+            <label htmlFor="phoneNumber">Phone number</label>
             <input
-              type="email"
+              type="text"
               className="form-control"
-              id="registerGmail"
-              placeholder="Gmail"
-              required
+              id="phoneNumber"
+              placeholder="Phone number"
+              {...register("phoneNumber", { required: true })}
             />
+            {errors.phoneNumber?.type === "required" && <span className="error">Phone number is required</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="age">Phone number</label>
+            <input
+              type="number"
+              className="form-control"
+              id="age"
+              placeholder="Your age"
+              {...register("age", { required: true })}
+            />
+            {errors.age?.type === "required" && <span className="error">Age number is required</span>}
           </div>
 
           <div
