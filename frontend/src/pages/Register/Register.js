@@ -1,29 +1,31 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import { useForm } from 'react-hook-form'
-import axios from 'axios'
+import { signin, userRegister } from '../../actions/userActions'
+import { useNavigate } from 'react-router-dom'
 
 function Login() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const password = useRef({});
   password.current = watch("password", "");
 
-  const onSubmitHandler = (userInfo) => {
-    const register = async () => {
-      try {
-        const { data } = await axios.post("/sign-up", {
-          email: userInfo.email,
-          password: userInfo.password,
-          studentId: userInfo.studentId,
-          phone: userInfo.phoneNumber,
-          age: userInfo.age
-        });
-        console.log(data);
-      } catch (error) {
-        console.log(error.message)
-      }
-    };
-    register();
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (localStorage.getItem("userSigninClassroom")) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
+
+  const onSubmitHandler = async (userInfo) => {
+    const result = await userRegister(userInfo.email, userInfo.password, userInfo.studentId, userInfo.phoneNumber, userInfo.age);
+    if (result) {
+      signin(userInfo.email, userInfo.password);
+      navigate("/dashboard");
+    }
+    else {
+      setMessage("Sign up fail!!!");
+    }
   }
 
   return (
@@ -33,6 +35,7 @@ function Login() {
         <form
           className="row g-3 needs-validation"
           onSubmit={handleSubmit(onSubmitHandler)}>
+          {message && <span className="error">{message}</span>}
           <div className="form-group">
             <label htmlFor="fullname" className="form-label">
               Fullname
@@ -130,7 +133,7 @@ function Login() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="age">Phone number</label>
+            <label htmlFor="age">Age</label>
             <input
               type="number"
               className="form-control"

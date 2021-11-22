@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import { useForm } from "react-hook-form";
 import { GoogleLogin } from "react-google-login";
+import { useNavigate } from 'react-router-dom'
+import { signin } from "../../actions/userActions";
 
 function Login() {
   const {
@@ -9,9 +11,37 @@ function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (localStorage.getItem("userSigninClassroom")) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
+  const [message, setMessage] = useState("");
 
-  const onSubmitHandler = (data) => {
-    console.log(data);
+  const onSubmitHandler = async (userInfo) => {
+    // const signin = async () => {
+    //   try {
+    //     const { data } = await axios.post("/sign-in", {
+    //       email: userInfo.email,
+    //       password: userInfo.password
+    //     });
+    //     if (data) {
+    //       localStorage.setItem("userSigninClassroom", JSON.stringify(data));
+    //       navigate("/dashboard");
+    //     }
+    //   } catch (error) {
+    //     setMessage("Wrong email or password");
+    //   }
+    // };
+    // signin();
+    const result = await signin(userInfo.email, userInfo.password);
+    if (result) {
+      navigate("/dashboard");
+    }
+    else {
+      setMessage("Wrong email or password");
+    }
   };
 
   const handleSuccess = (googleData) => {
@@ -29,6 +59,7 @@ function Login() {
           onSubmit={handleSubmit(onSubmitHandler)}
           className="row g-3 needs-validation"
         >
+          {message && <span className="error">{message}</span>}
           <div className="form-group">
             <label htmlFor="loginAccount">Account</label>
             <input
@@ -63,16 +94,7 @@ function Login() {
               <span className="error">Password is required</span>
             )}
           </div>
-          <div className="form-group form-check m-2">
-            <input
-              type="checkbox"
-              className="form-check-input"
-              id="exampleCheck1"
-            />
-            <label className="form-check-label" htmlFor="exampleCheck1">
-              Remember
-            </label>
-          </div>
+
           <div
             className="w-100"
             style={{ display: "flex", justifyContent: "center" }}
@@ -92,11 +114,11 @@ function Login() {
           >
             <small>
               Don't have an account?
-              <a href="/register" style={{ marginLeft: "10px" }}>
+              <a href="/register" style={{ marginLeft: "10px", color: "#2583ff" }}>
                 Sign up
               </a>
             </small>
-            <a href="/">Forgot your password?</a>
+            <a href="/" style={{ color: "#2583ff" }}>Forgot your password?</a>
           </div>
           <div style={{ textAlign: "center" }}>
             <GoogleLogin
