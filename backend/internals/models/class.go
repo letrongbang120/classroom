@@ -13,5 +13,10 @@ type Class struct {
 }
 
 type JoinClassRequest struct {
-	ClassID   string `json:"classId,omitempty" bson:"class_id,omitempty"`
+	ClassID string `json:"classId,omitempty" bson:"class_id,omitempty"`
+}
+
+type InviteByEmailRequest struct {
+	EmailList []string `json:"emailList,omitempty"`
+	ClassID   string   `json:"classId,omitempty"`
 }

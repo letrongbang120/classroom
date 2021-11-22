@@ -53,6 +53,9 @@ func NewHTTPHandler(
 	router.HandleFunc("/api/v1/invitation", Adapt(http.HandlerFunc(invitationDelivery.GetLink),
 		CheckTeacher(authenticator, accountDomain, classDomain)).ServeHTTP).Methods("POST")
 
+	router.HandleFunc("/api/v1/invitation/mail", Adapt(http.HandlerFunc(invitationDelivery.InviteByEmail),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("POST")
+
 	router.HandleFunc("/api/v1/class/join", Adapt(http.HandlerFunc(invitationDelivery.Join),
 		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("POST")
 
