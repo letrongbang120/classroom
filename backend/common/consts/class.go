@@ -1,6 +1,6 @@
 package consts
 
 const (
-	Host            = "http://localhost:3000"
+	Host            = "http://localhost:3000/c"
 	SubjectToInvite = "Invite To Join Classroom"
 )
