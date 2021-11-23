@@ -1,6 +1,6 @@
-import { Avatar, IconButton, MenuItem, Menu } from "@material-ui/core";
+import { IconButton, MenuItem, Menu } from "@material-ui/core";
 import { Add, Apps, Menu as MenuIcon } from "@material-ui/icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { createDialogAtom, joinDialogAtom } from "../../utils/atoms";
 import CreateClass from "../CreateClass/CreateClass";
@@ -19,6 +19,14 @@ function Navbar() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const [userName, setUserName] = useState("");
+  useEffect(() => {
+    if (localStorage.getItem("userSigninClassroom")) {
+      const user = JSON.parse(localStorage.getItem("userSigninClassroom"));
+      setUserName(user.email);
+    }
+  }, [])
 
   return (
     <>
@@ -47,9 +55,7 @@ function Navbar() {
           <IconButton>
             <Apps />
           </IconButton>
-          <IconButton>
-            <Avatar />
-          </IconButton>
+          {userName && <span className="name">{userName}</span>}
           <Menu
             id="simple-menu"
             anchorEl={anchorEl}

@@ -20,8 +20,15 @@ function Login() {
   const onSubmitHandler = async (userInfo) => {
     const result = await userRegister(userInfo.email, userInfo.password, userInfo.studentId, userInfo.phoneNumber, userInfo.age);
     if (result) {
-      signin(userInfo.email, userInfo.password);
-      navigate("/dashboard");
+      const signinAccount = async () => {
+        const res = await signin(userInfo.email, userInfo.password);
+        if (res) {
+          navigate("/dashboard");
+        } else {
+          setMessage("Sigg in fail");
+        }
+      }
+      signinAccount();
     }
     else {
       setMessage("Sign up fail!!!");

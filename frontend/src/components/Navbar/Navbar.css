@@ -39,3 +39,8 @@
   position: relative;
   margin: -10px;
 }
+
+.name {
+  font-weight: 600;
+  cursor: pointer;
+}
