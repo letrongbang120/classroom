@@ -2,64 +2,69 @@ package main
 
 import (
 	"fmt"
-	"net/smtp"
-	"strings"
+	"sync"
+	"time"
 )
 
-// smtpServer data to smtp server
-type smtpServer struct {
-	host string
-	port string
+func producer(num int) <-chan int {
+	out := make(chan int)
+	go func() {
+		defer close(out)
+		for i := 1; i <= num; i++ {
+			out <- i
+		}
+	}()
+	return out
 }
 
-type Mail struct {
-	Sender  string
-	To      []string
-	Subject string
-	Body    string
+func square(ch <-chan int) <-chan int {
+	out := make(chan int)
+	go func() {
+		defer close(out)
+		for i := range ch {
+			time.Sleep(1 * time.Millisecond)
+			out <- i * i
+		}
+	}()
+	return out
 }
 
-// Address URI to smtp server
-func (s *smtpServer) Address() string {
-	return s.host + ":" + s.port
+func merge(chs []<-chan int) <-chan int {
+	out := make(chan int)
+	wg := sync.WaitGroup{}
+	collect := func(ch <-chan int) {
+		for i := range ch {
+			out <- i
+		}
+		wg.Done()
+	}
+	for _, ch := range chs {
+		wg.Add(1)
+		go collect(ch)
+	}
+	go func() {
+		wg.Wait()
+		defer close(out)
+	}()
+	return out
 }
 
 func main() {
-	// Sender data.
-	from := "go.normal.icontrol@gmail.com"
-	password := "haopro123"
-	// Receiver email address.
-	to := []string{
-		"letrongbang0102@gmail.com",
-	}
-	message := "Click this link to join classroom http://localhost:3000"
-	mail := Mail{
-		Sender:  from,
-		To:      to,
-		Subject: "Test Send Invitation",
-		Body:    message,
-	}
+	t := time.Now()
+	in := producer(1000)
 
-	// smtp server configuration.
-	smtpServer := smtpServer{host: "smtp.gmail.com", port: "587"}
-	// Message.
-	// Authentication.
-	auth := smtp.PlainAuth("", from, password, smtpServer.host)
-	// Sending email.
-	err := smtp.SendMail(smtpServer.Address(), auth, from, to, []byte(BuildMessage(mail)))
-	if err != nil {
-		fmt.Println(err)
-		return
+	// Fan out
+	c1 := square(in)
+	// c2 := square(in)
+	// c3 := square(in)
+
+	count := 0
+	// consumer
+	for ret := range merge([]<-chan int{c1}) {
+		fmt.Printf("%v", ret)
+		count++
 	}
-	fmt.Println("Email Sent!")
-}
-
-func BuildMessage(mail Mail) string {
-	msg := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\r\n"
-	msg += fmt.Sprintf("From: %s\r\n", mail.Sender)
-	msg += fmt.Sprintf("To: %s\r\n", strings.Join(mail.To, ";"))
-	msg += fmt.Sprintf("Subject: %s\r\n", mail.Subject)
-	msg += fmt.Sprintf("\r\n%s\r\n", mail.Body)
-
-	return msg
+	fmt.Println("")
+	fmt.Println(count)
+	fmt.Println(time.Since(t).Seconds())
 }
