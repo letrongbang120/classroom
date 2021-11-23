@@ -5,12 +5,15 @@ import CardActions from "@mui/material/CardActions";
 import { AssignmentIndOutlined, FolderOpenOutlined } from "@material-ui/icons";
 //import { useHistory } from "react-router-dom";
 import "./ClassCard.css";
+import { Link } from "react-router-dom";
 
-function ClassCard() {
+function ClassCard(props) {
   return (
-    <div className="classCard">
+    <div className="classCard" >
       <div className="classCard__upper">
-        <div className="classCard__className">Class Name</div>
+        <Link to={`/c/${props.courseId}`}>
+          <div className="classCard__className">Class Name</div>
+        </Link>
         <div className="classCard__creatorName">Teacher</div>
         <img
           src="https://upload.wikimedia.org/wikipedia/commons/5/59/Google_Classroom_Logo.png"

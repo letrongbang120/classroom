@@ -1,12 +1,15 @@
 import Button from '@restart/ui/esm/Button';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Table } from 'react-bootstrap';
 import { useParams } from 'react-router-dom'
+import { getClass } from '../../actions/classAction';
 import CourseHeader from '../../components/CourseHeader/CourseHeader';
 import './styles.css'
 
 export default function CoursePage() {
   const [showExtend, setShowExtend] = useState(false);
+  const [course, setCourse] = useState();
+  const [message, setMessage] = useState("");
   const { courseId } = useParams();
   const members = [
     {
@@ -25,7 +28,7 @@ export default function CoursePage() {
       email: "danh@email.com",
     },
   ]
-  const course = {
+  const Course = {
     _id: courseId,
     name: "[CQ] PTUDWNC - 18_3",
     part: "PTUDWNC",
@@ -34,43 +37,61 @@ export default function CoursePage() {
     members: members
   };
 
+  useEffect(() => {
+    const func = async () => {
+      const result = await getClass(courseId);
+      return result;
+    }
+    const res = func();
+    if (res) {
+      setCourse(res);
+    } else {
+      setMessage("Class ID is not found.");
+    }
+  }, [courseId]);
+
   return (
     <React.Fragment>
-      <CourseHeader course={course} />
-      <div className="course-info" onClick={() => { setShowExtend(!showExtend) }}>
-        <div className="course-info__inner">
-          <h2>{course.name}</h2>
-          <h4>{course.part}</h4>
-        </div>
-        {showExtend && <div className="course-info__extend">
-          <h6>Topic: {course.theme}</h6>
-        </div>}
-      </div>
-      <div className="members">
-        <h2>Members in course</h2>
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              course.members.map(member =>
-                <tr key={member._id}>
-                  <td>{member._id}</td>
-                  <td>{member.name}</td>
-                  <td>{member.email}</td>
-                  <td><Button variant="danger">Remove</Button></td>
+      {message && <span className="error">{message}</span>}
+      {course &&
+        <div>
+          <CourseHeader course={course} />
+          <div className="course-info" onClick={() => { setShowExtend(!showExtend) }}>
+            <div className="course-info__inner">
+              <h2>{Course.name}</h2>
+              <h4>{Course.part}</h4>
+            </div>
+            {showExtend && <div className="course-info__extend">
+              <h6>Topic: {Course.theme}</h6>
+            </div>}
+          </div>
+          <div className="members">
+            <h2>Members in course</h2>
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Action</th>
                 </tr>
-              )
-            }
-          </tbody>
-        </Table>
-      </div>
+              </thead>
+              <tbody>
+                {
+                  Course.members.map(member =>
+                    <tr key={member._id}>
+                      <td>{member._id}</td>
+                      <td>{member.name}</td>
+                      <td>{member.email}</td>
+                      <td><Button variant="danger">Remove</Button></td>
+                    </tr>
+                  )
+                }
+              </tbody>
+            </Table>
+          </div>
+        </div>}
+
     </React.Fragment>
   )
 }
