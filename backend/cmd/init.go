@@ -123,8 +123,8 @@ func (s *srv) loadLogger() error {
 }
 
 func (s *srv) connectMongo() error {
-	// s.mgoClientOptions = options.Client().ApplyURI("mongodb://my_database:27017")
-	s.mgoClientOptions = options.Client().ApplyURI("mongodb://localhost:27017/my_classroom_db")
+	s.mgoClientOptions = options.Client().ApplyURI("mongodb://my_database:27017")
+	// s.mgoClientOptions = options.Client().ApplyURI("mongodb://localhost:27017/my_classroom_db")
 	// connect to mongoDb
 	var err error
 	s.mgoClient, err = mongo.Connect(context.TODO(), s.mgoClientOptions)
