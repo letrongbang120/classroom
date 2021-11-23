@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom'
 import { getClass } from '../../actions/classAction';
 import CourseHeader from '../../components/CourseHeader/CourseHeader';
 import './styles.css'
+import { useNavigate } from 'react-router-dom'
 
 export default function CoursePage() {
   const [showExtend, setShowExtend] = useState(false);
@@ -36,10 +37,19 @@ export default function CoursePage() {
     room: "12",
     members: members
   };
+  const [user, setUser] = useState({});
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (localStorage.getItem("userSigninClassroom")) {
+      setUser(JSON.parse(localStorage.getItem("userSigninClassroom")));
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const func = async () => {
-      const result = await getClass(courseId);
+      const result = await getClass(courseId, user.token);
       return result;
     }
     const res = func();
@@ -48,7 +58,7 @@ export default function CoursePage() {
     } else {
       setMessage("Class ID is not found.");
     }
-  }, [courseId]);
+  }, [courseId, user]);
 
   return (
     <React.Fragment>

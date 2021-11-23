@@ -10,9 +10,11 @@ export const createClass = async (room, name, teacherId, theme, description) => 
   }
 }
 
-export const getClass = async (id) => {
+export const getClass = async (id, token) => {
   try {
-    const { data } = await axios.get(`/class?classId=${id}`);
+    const { data } = await axios.get(`/class?classId=${id}`, {
+      headers: { Authorization: token }
+    });
     console.log(data);
     return data;
   } catch (error) {

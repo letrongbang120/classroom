@@ -10,10 +10,10 @@ export const signin = async (email, password) => {
   }
 }
 
-export const userRegister = async (email, password, studentId, phone, age) => {
+export const userRegister = async (username, email, password, studentId, phone, age) => {
   try {
     const ageNumber = Number(age);
-    const { data } = await axios.post("/sign-up", { email, password, studentId, phone, age: ageNumber });
+    const { data } = await axios.post("/sign-up", { username, email, password, studentId, phone, age: ageNumber });
     console.log(data);
     return true;
   } catch (error) {

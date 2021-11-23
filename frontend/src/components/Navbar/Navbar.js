@@ -24,7 +24,7 @@ function Navbar() {
   useEffect(() => {
     if (localStorage.getItem("userSigninClassroom")) {
       const user = JSON.parse(localStorage.getItem("userSigninClassroom"));
-      setUserName(user.email);
+      setUserName(user.username);
     }
   }, [])
 

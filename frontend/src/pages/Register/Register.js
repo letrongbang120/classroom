@@ -18,7 +18,7 @@ function Login() {
   }, [navigate]);
 
   const onSubmitHandler = async (userInfo) => {
-    const result = await userRegister(userInfo.email, userInfo.password, userInfo.studentId, userInfo.phoneNumber, userInfo.age);
+    const result = await userRegister(userInfo.fullname, userInfo.email, userInfo.password, userInfo.studentId, userInfo.phoneNumber, userInfo.age);
     if (result) {
       const signinAccount = async () => {
         const res = await signin(userInfo.email, userInfo.password);
