@@ -1,7 +1,13 @@
 import { IconButton, MenuItem, Menu } from "@material-ui/core";
 import { Add, Apps, Menu as MenuIcon } from "@material-ui/icons";
+import Tooltip from '@mui/material/Tooltip';
 import React, { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
+import Avatar from '@mui/material/Avatar';
+import Divider from '@mui/material/Divider';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Logout from '@mui/icons-material/Logout';
+
 import { createDialogAtom, joinDialogAtom } from "../../utils/atoms";
 import CreateClass from "../CreateClass/CreateClass";
 import JoinClass from "../JoinClass/JoinClass";
@@ -26,7 +32,7 @@ function Navbar() {
       const user = JSON.parse(localStorage.getItem("userSigninClassroom"));
       setUserName(user.email);
     }
-  }, [])
+  }, []);
 
   return (
     <>
@@ -55,7 +61,11 @@ function Navbar() {
           <IconButton>
             <Apps />
           </IconButton>
-          {userName && <span className="name">{userName}</span>}
+          <Tooltip title="Account settings">
+            <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
+              <Avatar sx={{ width: 32, height: 32 }}>{userName}</Avatar>
+            </IconButton>
+          </Tooltip>
           <Menu
             id="simple-menu"
             anchorEl={anchorEl}
@@ -78,6 +88,51 @@ function Navbar() {
               }}
             >
               Join Class
+            </MenuItem>
+          </Menu>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            onClick={handleClose}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: "visible",
+                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                mt: 1.5,
+                "& .MuiAvatar-root": {
+                  width: 32,
+                  height: 32,
+                  ml: -0.5,
+                  mr: 1,
+                },
+                "&:before": {
+                  content: '""',
+                  display: "block",
+                  position: "absolute",
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: "background.paper",
+                  transform: "translateY(-50%) rotate(45deg)",
+                  zIndex: 0,
+                },
+              },
+            }}
+            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          >
+            <MenuItem>
+              <Avatar /> Profile
+            </MenuItem>
+            <Divider />
+            <MenuItem>
+              <ListItemIcon>
+                <Logout fontSize="small" />
+              </ListItemIcon>
+              Logout
             </MenuItem>
           </Menu>
         </div>
