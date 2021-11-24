@@ -3,8 +3,7 @@ import "../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import { useForm } from "react-hook-form";
 import { GoogleLogin } from "react-google-login";
 import { useNavigate } from 'react-router-dom'
-import { signin } from "../../actions/userActions";
-import { OAuth2Client } from 'google-auth-library'
+import { signin, signInByEmail } from "../../actions/userActions";
 
 function Login() {
   const {
@@ -21,21 +20,6 @@ function Login() {
   const [message, setMessage] = useState("");
 
   const onSubmitHandler = async (userInfo) => {
-    // const signin = async () => {
-    //   try {
-    //     const { data } = await axios.post("/sign-in", {
-    //       email: userInfo.email,
-    //       password: userInfo.password
-    //     });
-    //     if (data) {
-    //       localStorage.setItem("userSigninClassroom", JSON.stringify(data));
-    //       navigate("/dashboard");
-    //     }
-    //   } catch (error) {
-    //     setMessage("Wrong email or password");
-    //   }
-    // };
-    // signin();
     const result = await signin(userInfo.email, userInfo.password);
     if (result) {
       navigate("/dashboard");
@@ -46,17 +30,17 @@ function Login() {
   };
 
   const handleSuccess = (googleData) => {
-    console.log(googleData.tokenId);
-    const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
-    const getTicket = async () => {
-      const ticket = await client.verifyIdToken({
-        idToken: googleData.tokenId
-      });
-      const { email } = ticket.getPayload();
-      return { email }
+    const signIn = async () => {
+      const res = await signInByEmail(googleData.tokenId);
+      if (res) {
+        localStorage.setItem("userSigninClassroom", JSON.stringify(res));
+        navigate("/dashboard");
+      }
+      else {
+        setMessage("Your email isn't registered");
+      }
     }
-    const { ggEmail } = getTicket();
-    console.log(ggEmail);
+    signIn();
   };
   const handleFailure = (result) => {
     alert(result);

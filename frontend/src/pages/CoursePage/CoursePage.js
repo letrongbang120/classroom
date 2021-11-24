@@ -174,7 +174,7 @@ export default function CoursePage() {
             {showExtend && (
               <div className="course-info__extend">
                 <h6>Topic: {course.theme}</h6>
-                <h6>Teacher: {members.filter(member=>member.accountId===course.teacherId)[0].username}</h6>
+                <h6>Teacher: {members.filter(member => member.accountId === course.teacherId)[0].username}</h6>
               </div>
             )}
           </div>
@@ -225,7 +225,7 @@ export default function CoursePage() {
                       >
                         Create invite link
                       </button>
-                      {link && <span className="mt-3" style={{display: 'block'}}>{link}</span>}
+                      {link && <span className="mt-3" style={{ display: 'block' }}>{link}</span>}
                     </div>
                   </div>
 
@@ -274,15 +274,15 @@ export default function CoursePage() {
                       </div>
 
                       <div className="col-md-12">
-                        <label htmlFor="topic" className="labels">
-                          Topic
+                        <label htmlFor="Theme" className="labels">
+                          Theme
                         </label>
                         <input
                           type="text"
-                          id="topic"
+                          id="theme"
                           className="form-control"
-                          placeholder="Topic of Class"
-                          {...register1("topic", { required: true })}
+                          placeholder="Theme of Class"
+                          {...register1("theme", { required: true })}
                         ></input>
                         {errors1.theme?.type === "required" && (
                           <span className="error">

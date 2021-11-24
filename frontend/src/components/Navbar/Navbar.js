@@ -9,6 +9,8 @@ import { createDialogAtom, joinDialogAtom } from "../../utils/atoms";
 import CreateClass from "../CreateClass/CreateClass";
 import JoinClass from "../JoinClass/JoinClass";
 import "./Navbar.css";
+import { useNavigate } from "react-router";
+import { signout } from "../../actions/userActions";
 
 function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -23,13 +25,23 @@ function Navbar() {
     setAnchorEl(null);
   };
 
-  const [userName, setUserName] = useState("");
+  const [user, setUser] = useState({});
   useEffect(() => {
     if (localStorage.getItem("userSigninClassroom")) {
       const user = JSON.parse(localStorage.getItem("userSigninClassroom"));
-      setUserName(user.username);
+      setUser(user);
     }
   }, []);
+
+  const navigate = useNavigate();
+  const profileClickHandler = () => {
+    navigate(`/u/${user.accountId}`);
+  }
+
+  const logOutHandler = () => {
+    signout();
+    navigate("/login");
+  }
 
   return (
     <>
@@ -46,7 +58,7 @@ function Navbar() {
               alt="Google Logo"
               className="navbar__logo"
             />{" "}
-            <span className="classroom" style ={{display: "inline-block"}}>Classroom</span>
+            <span className="classroom" style={{ display: "inline-block" }}>Classroom</span>
           </a>
         </div>
         <div className="navbar__right">
@@ -65,11 +77,17 @@ function Navbar() {
             {(popupState) => (
               <React.Fragment>
                 <Button variant="contained" {...bindTrigger(popupState)}>
-                  {userName}
+                  {user.username}
                 </Button>
                 <Menu {...bindMenu(popupState)} style={{ marginTop: "40px" }}>
-                  <MenuItem onClick={popupState.close}>Profile</MenuItem>
-                  <MenuItem onClick={popupState.close}>Logout</MenuItem>
+                  <MenuItem onClick={() => {
+                    popupState.close();
+                    profileClickHandler();
+                  }}>Profile</MenuItem>
+                  <MenuItem onClick={() => {
+                    popupState.close();
+                    logOutHandler();
+                  }}>Logout</MenuItem>
                 </Menu>
               </React.Fragment>
             )}

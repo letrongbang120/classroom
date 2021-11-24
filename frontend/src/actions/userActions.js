@@ -10,6 +10,16 @@ export const signin = async (email, password) => {
   }
 }
 
+export const signInByEmail = async (token) => {
+  try {
+    const { data } = await axios.post("/sign-in/token", { token });
+    console.log(data);
+    return data;
+  } catch (error) {
+    return false;
+  }
+}
+
 export const userRegister = async (username, email, password, studentId, phone, age) => {
   try {
     const ageNumber = Number(age);
