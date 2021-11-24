@@ -45,3 +45,17 @@ export const getClassById = async (accountId, token) => {
     return false;
   }
 }
+
+export const updateUser = async (username, studentId, phone, age, token) => {
+  try {
+    const ageNumber = Number(age);
+    console.log(token)
+    const { data } = await axios.put("/account", { username, studentId, phone, age: ageNumber }, {
+      headers: { Authorization: token }
+    });
+    console.log(data);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}

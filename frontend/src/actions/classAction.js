@@ -57,3 +57,15 @@ export const inviteByEmail = async (emailList, classId, token) => {
     return false;
   }
 }
+
+export const updateClass = async (classId, name, description, theme, room, token) => {
+  try {
+    const { data } = await axios.put("/class", { classId, name, description, theme, room }, {
+      headers: { Authorization: token }
+    })
+    console.log(data);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
