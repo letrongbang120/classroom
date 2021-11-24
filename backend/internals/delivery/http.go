@@ -28,6 +28,8 @@ func NewHTTPHandler(
 
 	router.HandleFunc("/api/v1/sign-in", accountDelivery.SignIn).Methods("POST")
 
+	router.HandleFunc("/api/v1/sign-in/token", accountDelivery.SignInByToken).Methods("POST")
+
 	router.HandleFunc("/api/v1/account", accountDelivery.GetAccountById).Methods("GET")
 
 	router.HandleFunc("/api/v1/account", Adapt(http.HandlerFunc(accountDelivery.UpdateInfo),

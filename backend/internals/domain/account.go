@@ -16,6 +16,7 @@ import (
 type Account interface {
 	SignUp(ctx context.Context, req *models.Account) (*models.Account, error)
 	SignIn(ctx context.Context, req *models.Account) (*models.Account, string, error)
+	SignInByToken(ctx context.Context, req *models.Account) (*models.Account, string, error)
 	UpdateInfo(ctx context.Context, accountId string, req *models.Account) (*models.Account, error)
 	CheckAuth(ctx context.Context, accountId string) (*models.Account, error)
 }
@@ -56,6 +57,32 @@ func (d *accountDomain) SignIn(ctx context.Context, req *models.Account) (*model
 
 	if !res.IsCorrectPassword(req.Password) {
 		return nil, "", errors.ErrPasswordIsNotCorrect
+	}
+
+	tkn, err := d.authenticator.Generate(&requestinfo.Info{
+		AccountID: res.AccountID,
+	})
+
+	if err != nil {
+		return nil, "", status.Errorf(codes.Internal, "gen token %w", err)
+	}
+
+	return res, tkn.Token, nil
+}
+
+func (d *accountDomain) SignInByToken(ctx context.Context, req *models.Account) (*models.Account, string, error) {
+	data, err := token.VerifyGoogleIDToken(req.Token)
+	if err != nil {
+		return nil, "", err
+	}
+
+	res, err := d.accountRepository.FindByEmail(ctx, data.Email)
+	if err == errors.ErrEmailNotFound {
+		req.Email = data.Email
+		res, err = d.SignUp(ctx, req)
+		if err != nil {
+			return nil, "", err
+		}
 	}
 
 	tkn, err := d.authenticator.Generate(&requestinfo.Info{
