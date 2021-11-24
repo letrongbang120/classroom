@@ -16,6 +16,7 @@ import (
 type Account interface {
 	SignUp(ctx context.Context, req *models.Account) (*models.Account, error)
 	SignIn(ctx context.Context, req *models.Account) (*models.Account, string, error)
+	UpdateInfo(ctx context.Context, accountId string, req *models.Account) (*models.Account, error)
 	CheckAuth(ctx context.Context, accountId string) (*models.Account, error)
 }
 
@@ -69,6 +70,19 @@ func (d *accountDomain) SignIn(ctx context.Context, req *models.Account) (*model
 }
 
 func (d *accountDomain) CheckAuth(ctx context.Context, accountId string) (*models.Account, error) {
+	res, err := d.accountRepository.FindByAccountId(ctx, accountId)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (d *accountDomain) UpdateInfo(ctx context.Context, accountId string, account *models.Account) (*models.Account, error) {
+	if err := d.accountRepository.UpdateInfo(ctx, accountId, account); err != nil {
+		return nil, err
+	}
+
 	res, err := d.accountRepository.FindByAccountId(ctx, accountId)
 	if err != nil {
 		return nil, err

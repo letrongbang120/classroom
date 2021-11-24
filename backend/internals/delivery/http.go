@@ -30,6 +30,9 @@ func NewHTTPHandler(
 
 	router.HandleFunc("/api/v1/account", accountDelivery.GetAccountById).Methods("GET")
 
+	router.HandleFunc("/api/v1/account", Adapt(http.HandlerFunc(accountDelivery.UpdateInfo),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("PUT")
+
 	// class
 	router.HandleFunc("/api/v1/class", Adapt(http.HandlerFunc(classDelivery.Create),
 		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("POST")

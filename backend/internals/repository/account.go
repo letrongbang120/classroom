@@ -16,6 +16,7 @@ type Account interface {
 	Create(ctx context.Context, account *models.Account) (*models.Account, error)
 	FindByEmail(ctx context.Context, email string) (*models.Account, error)
 	FindByAccountId(ctx context.Context, accountId string) (*models.Account, error)
+	UpdateInfo(ctx context.Context, accountId string, account *models.Account) error
 }
 
 type accountRepository struct {
@@ -60,4 +61,11 @@ func (r *accountRepository) FindByAccountId(ctx context.Context, accountId strin
 		return nil, err
 	}
 	return &result, nil
+}
+
+func (r *accountRepository) UpdateInfo(ctx context.Context, accountId string, account *models.Account) error {
+	_, err := r.coll.UpdateOne(ctx, bson.M{"account_id": accountId}, bson.M{
+		"$set": account,
+	})
+	return err
 }
