@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { GoogleLogin } from "react-google-login";
 import { useNavigate } from 'react-router-dom'
 import { signin } from "../../actions/userActions";
+import { OAuth2Client } from 'google-auth-library'
 
 function Login() {
   const {
@@ -46,6 +47,16 @@ function Login() {
 
   const handleSuccess = (googleData) => {
     console.log(googleData.tokenId);
+    const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
+    const getTicket = async () => {
+      const ticket = await client.verifyIdToken({
+        idToken: googleData.tokenId
+      });
+      const { email } = ticket.getPayload();
+      return { email }
+    }
+    const { ggEmail } = getTicket();
+    console.log(ggEmail);
   };
   const handleFailure = (result) => {
     alert(result);

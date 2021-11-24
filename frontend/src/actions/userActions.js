@@ -20,3 +20,28 @@ export const userRegister = async (username, email, password, studentId, phone, 
     return false;
   }
 }
+
+export const signout = () => {
+  localStorage.removeItem("userSigninClassroom");
+}
+
+export const getUserById = async (userId) => {
+  try {
+    const { data } = await axios.get(`/account?accountId=${userId}`);
+    console.log(data);
+    return data;
+  } catch (error) {
+    return false;
+  }
+}
+
+export const getClassById = async (accountId, token) => {
+  try {
+    const { data } = await axios.get(`/class/me?accountId=${accountId}`, {
+      headers: { Authorization: token }
+    });
+    return data;
+  } catch (error) {
+    return false;
+  }
+}

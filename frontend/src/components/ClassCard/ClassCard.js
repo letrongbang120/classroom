@@ -11,10 +11,10 @@ function ClassCard(props) {
   return (
     <div className="classCard" >
       <div className="classCard__upper">
-        <Link to={`/c/${props.courseId}`}>
-          <div className="classCard__className">Class Name</div>
+        <Link to={`/c/${props.classId}`}>
+          <div className="classCard__className">{props.name}</div>
         </Link>
-        <div className="classCard__creatorName">Teacher</div>
+        <div className="classCard__creatorName">{props.teacherId}</div>
         <img
           src="https://upload.wikimedia.org/wikipedia/commons/5/59/Google_Classroom_Logo.png"
           className="classCard__creatorPhoto"

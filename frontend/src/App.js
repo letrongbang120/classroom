@@ -27,7 +27,7 @@ function App() {
           }
         />
         <Route
-          path="/profile"
+          path="/u/:userId"
           element={
             <React.Fragment>
               {/* <Navbar /> */}

@@ -66,7 +66,7 @@ function Navbar() {
                 <Button variant="contained" {...bindTrigger(popupState)}>
                   {userName}
                 </Button>
-                <Menu {...bindMenu(popupState)} style={{ marginTop: "40px"}}>
+                <Menu {...bindMenu(popupState)} style={{ marginTop: "40px" }}>
                   <MenuItem onClick={popupState.close}>Profile</MenuItem>
                   <MenuItem onClick={popupState.close}>Logout</MenuItem>
                 </Menu>
@@ -79,7 +79,7 @@ function Navbar() {
             keepMounted
             open={Boolean(anchorEl)}
             onClose={handleClose}
-            style={{marginTop:'40px'}}
+            style={{ marginTop: '40px' }}
           >
             <MenuItem
               onClick={() => {

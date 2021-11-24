@@ -1,42 +1,22 @@
-import Button from '@restart/ui/esm/Button';
 import React, { useEffect, useState } from 'react'
 import { Table } from 'react-bootstrap';
 import { useParams } from 'react-router-dom'
-import { getClass } from '../../actions/classAction';
+import { createLink, getClass, inviteByEmail, joinClass } from '../../actions/classAction';
 import CourseHeader from '../../components/CourseHeader/CourseHeader';
 import './styles.css'
 import { useNavigate } from 'react-router-dom'
+import { getUserById } from '../../actions/userActions';
+import { useForm } from 'react-hook-form'
 
 export default function CoursePage() {
   const [showExtend, setShowExtend] = useState(false);
   const [course, setCourse] = useState();
   const [message, setMessage] = useState("");
   const { courseId } = useParams();
-  const members = [
-    {
-      _id: "1",
-      name: "Le Trong Bang",
-      email: "banglt@email.com",
-    },
-    {
-      _id: "2",
-      name: "Bui Hoan Hao",
-      email: "hao@email.com",
-    },
-    {
-      _id: "3",
-      name: "Vo Van Hoang Danh",
-      email: "danh@email.com",
-    },
-  ]
-  const Course = {
-    _id: courseId,
-    name: "[CQ] PTUDWNC - 18_3",
-    part: "PTUDWNC",
-    theme: "CQ 18_3",
-    room: "12",
-    members: members
-  };
+  const [members, setMembers] = useState([]);
+  const [link, setLink] = useState("");
+  const [join, setJoin] = useState(false);
+
   const [user, setUser] = useState({});
   const navigate = useNavigate();
   useEffect(() => {
@@ -50,56 +30,163 @@ export default function CoursePage() {
   useEffect(() => {
     const func = async () => {
       const result = await getClass(courseId, user.token);
-      return result;
+      if (result) {
+        setCourse(result);
+      }
+      else {
+        setMessage("Class ID is not found.");
+      }
     }
-    const res = func();
-    if (res) {
-      setCourse(res);
-    } else {
-      setMessage("Class ID is not found.");
+    if (user.token) {
+      func();
     }
   }, [courseId, user]);
 
+  useEffect(() => {
+    if (course && user) {
+      if (course.teacherId !== user.accountId && !course.studentIds) {
+        const invite = async () => {
+          const res = await joinClass(course.classId, user.token);
+          if (res) {
+            setCourse(res);
+            setJoin(true);
+          }
+        }
+        invite();
+      } else {
+        if (course.teacherId !== user.accountId && !course.studentIds.includes(user.accountId)) {
+          const invite = async () => {
+            const res = await joinClass(course.classId, user.token);
+            if (res) {
+              setCourse(res);
+              setJoin(true);
+            }
+          }
+          invite();
+        }
+      }
+
+    }
+  }, [course, user])
+
+  useEffect(() => {
+    if (course) {
+      const insertTeacher = async () => {
+        const res = await getUserById(course.teacherId);
+        setMembers(prevMembers => {
+          if (prevMembers.includes(res)) {
+            return prevMembers
+          }
+          else {
+            return [...prevMembers, res]
+          }
+
+        });
+      }
+      insertTeacher();
+      if (course.studentIds) {
+        for (const studentId of course.studentIds) {
+          const insertStudent = async (id) => {
+            const res = await getUserById(id);
+            setMembers(prevMembers => [...prevMembers, res]);
+          }
+          insertStudent(studentId);
+        }
+      }
+
+    }
+  }, [course])
+
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  const submitSendEmail = (data) => {
+    const send = async () => {
+      const res = await inviteByEmail([data.email], course.classId, user.token);
+      if (res) {
+        alert("invited successful !!!");
+      }
+      else {
+        alert("invited fail");
+      }
+    }
+    send();
+  }
+
+  const createLinkInvite = async () => {
+    const res = await createLink(course.classId, user.token);
+    setLink(res)
+  }
   return (
     <React.Fragment>
       {message && <span className="error">{message}</span>}
       {course &&
         <div>
-          <CourseHeader course={course} />
+          <CourseHeader course={course} user={user} />
           <div className="course-info" onClick={() => { setShowExtend(!showExtend) }}>
             <div className="course-info__inner">
-              <h2>{Course.name}</h2>
-              <h4>{Course.part}</h4>
+              <h2>{course.name}</h2>
+              <h4>{course.room}</h4>
+              {join && <span className="success">You joined class</span>}
             </div>
             {showExtend && <div className="course-info__extend">
-              <h6>Topic: {Course.theme}</h6>
+              <h6>Topic: {course.theme}</h6>
+              <h6>Teacher: {course.teacherId}</h6>
             </div>}
           </div>
-          <div className="members">
-            <h2>Members in course</h2>
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {
-                  Course.members.map(member =>
-                    <tr key={member._id}>
-                      <td>{member._id}</td>
-                      <td>{member.name}</td>
-                      <td>{member.email}</td>
-                      <td><Button variant="danger">Remove</Button></td>
+          {course.teacherId === user.accountId &&
+            <div>
+              <form onSubmit={handleSubmit(submitSendEmail)}>
+                <div>
+                  <label htmlFor="invitation">Invite teacher/student by email</label>
+                  <input
+                    type="text"
+                    id="invitation"
+                    placeholder="Input email"
+                    {...register("email", {
+                      required: true,
+                      pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                    })}
+                  ></input>
+                  {errors.email?.type === "required" && <span className="error">Empty email</span>}
+                  {errors.email?.type === "pattern" && <span className="error">Invalid email</span>}
+                </div>
+                <button type="submit">Send</button>
+              </form>
+              <div>
+                <button onClick={createLinkInvite}>Create link invite</button>
+                {link && <span>{link}</span>}
+              </div>
+              <div className="members">
+                <h2>Members in course</h2>
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Role</th>
                     </tr>
-                  )
-                }
-              </tbody>
-            </Table>
-          </div>
+                  </thead>
+                  <tbody>
+                    {
+                      members && members.map((member, index) => {
+                        return (
+                          <tr key={member.accountId}>
+                            <td>{index}</td>
+                            <td>{member.username}</td>
+                            <td>{member.email}</td>
+                            <td>{member.accountId === course.teacherId ? "Teacher" : "Student"}</td>
+                          </tr>
+                        )
+                      }
+                      )
+                    }
+                  </tbody>
+                </Table>
+              </div>
+            </div>
+
+          }
+
         </div>}
 
     </React.Fragment>

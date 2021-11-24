@@ -30,9 +30,10 @@ function CreateClass() {
       navigate("/login");
     }
   }, [navigate]);
+
   const { register, handleSubmit, formState: { errors } } = useForm();
   const submitHanlder = async (data) => {
-    const result = await createClass(data.room, data.name, user.accountId, data.theme, data.description);
+    const result = await createClass(data.room, data.name, user.accountId, data.theme, data.description, user.token);
     if (result) {
       navigate(`/c/${result.classId}`);
     }

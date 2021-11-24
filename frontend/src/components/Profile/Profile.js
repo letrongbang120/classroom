@@ -1,8 +1,48 @@
-import React from "react";
-
+import React, { useEffect, useRef, useState } from "react";
+import { useForm } from 'react-hook-form'
+import { useParams } from "react-router";
 import "../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import { getUserById } from "../../actions/userActions";
 
 function Profile() {
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm({});
+  const {
+    register: register2,
+    handleSubmit: handleSubmit2,
+    watch: watch2,
+    formState: { errors: errors2 }
+  } = useForm({});
+
+  const [user, setUser] = useState({});
+  const [message, setMessage] = useState("");
+  const { userId } = useParams();
+  useEffect(() => {
+    const getUser = async () => {
+      const result = await getUserById(userId);
+      if (result) {
+        setUser(result);
+        setValue("fullname", result.username);
+        setValue("studentId", result.studentId);
+        setValue("phoneNumber", result.phone);
+        setValue("age", result.age);
+      }
+      else {
+        setMessage("User ID not found");
+      }
+    }
+    getUser();
+  }, [userId, setValue]);
+
+  const submitProfile = (data) => {
+    console.log(data)
+  }
+
+  const newPassword = useRef({});
+  newPassword.current = watch2("newPassword", "");
+  const submitPassword = (data) => {
+    console.log(data);
+  }
+
   return (
     <div className="container rounded bg-white mt-5 mb-5">
       <div className="row">
@@ -12,20 +52,18 @@ function Profile() {
               className="rounded-circle mt-5"
               width="150px"
               src="https://1000logos.net/wp-content/uploads/2021/05/Google-logo.png"
+              alt="google classroom"
             />
-            <span className="text-black-50">Yourmail@gmail.com</span>
-            <span> </span>
+            <span className="text-black-50">{user.email ? user.email : ""}</span>
           </div>
         </div>
 
         <div className="col-md-5 border-right">
           <div className="p-3 py-5">
-              
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h2 className="text-right">Profile Setting</h2>
             </div>
-            
-            <form className="row g-2 needs-validation">
+            <form className="row g-2 needs-validation" onSubmit={handleSubmit(submitProfile)}>
               <div className="col-md-12">
                 <label htmlFor="fullname" className="labels">Fullname</label>
                 <input
@@ -34,7 +72,7 @@ function Profile() {
                   name="fullname"
                   className="form-control"
                   placeholder="Fullname"
-                  value=""
+                  {...register("fullname")}
                 />
               </div>
 
@@ -43,10 +81,10 @@ function Profile() {
                 <input
                   type="text"
                   id="studentId"
-                    name="studentId"
+                  name="studentId"
                   className="form-control"
                   placeholder="ID Student"
-                  value=""
+                  {...register("studentId")}
                 />
               </div>
 
@@ -57,7 +95,7 @@ function Profile() {
                   className="form-control"
                   id="phoneNumber"
                   placeholder="Phone number"
-                  value=""
+                  {...register("phoneNumber")}
                 />
               </div>
 
@@ -68,10 +106,9 @@ function Profile() {
                   id="age"
                   className="form-control"
                   placeholder="Your age"
-                  value=""
+                  {...register("age")}
                 />
               </div>
-
               <div className="mt-5 text-center">
                 <button className="btn btn-primary profile-button" type="submit">
                   Save Profile
@@ -80,13 +117,13 @@ function Profile() {
             </form>
           </div>
         </div>
-        <div class="col-md-5">
-            <div class="p-3 py-5">
+
+        <div className="col-md-5">
+          <div className="p-3 py-5">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h2 className="text-right">Change Password</h2>
             </div>
-            
-            <form className="row g-2 needs-validation">
+            <form className="row g-2 needs-validation" onSubmit={handleSubmit2(submitPassword)}>
               <div className="col-md-12">
                 <label htmlFor="curPassword" className="labels">Your current password</label>
                 <input
@@ -95,19 +132,22 @@ function Profile() {
                   name="curPassword"
                   className="form-control"
                   placeholder="Current password"
+                  {...register2("currentPassword")}
                 />
               </div>
 
               <div className="col-md-12">
-                <label htmlFor="newPassword" className="labels">ID Student</label>
+                <label htmlFor="newPassword" className="labels">New password</label>
                 <input
                   type="password"
                   id="newPassword"
-                    name="studentId"
+                  name="studentId"
                   className="form-control"
                   placeholder="New password"
+                  {...register2("newPassword", { minLength: 6 })}
                 />
               </div>
+              {errors2.newPassword?.type === "minLength" && <span className="error">Password must contain at least 6 characters</span>}
 
               <div className="col-md-12">
                 <label htmlFor="confirmPassword" className="labels">Phone number</label>
@@ -116,7 +156,14 @@ function Profile() {
                   className="form-control"
                   id="confirmPassword"
                   placeholder="Confirm password"
+                  {...register2("confirmNewPassword", {
+                    minLength: 6,
+                    validate: value =>
+                      value === newPassword.current || "Confirm password doesn't match"
+                  })}
                 />
+                {errors2.confirmNewPassword?.message && <span className="error">{errors2.confirmNewPassword.message}</span>}
+                {errors2.confirmNewPassword?.type === "minLength" && <span className="error">Password must contain at least 6 characters</span>}
               </div>
 
               <div className="mt-5 text-center">
@@ -125,9 +172,9 @@ function Profile() {
                 </button>
               </div>
             </form>
-            </div>
+          </div>
         </div>
-      
+
       </div>
     </div>
   );
