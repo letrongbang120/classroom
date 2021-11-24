@@ -15,7 +15,6 @@ function Navbar() {
   const [createOpened, setCreateOpened] = useRecoilState(createDialogAtom);
   const [joinOpened, setJoinOpened] = useRecoilState(joinDialogAtom);
 
-
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -38,15 +37,17 @@ function Navbar() {
       <JoinClass />
       <nav className="navbar">
         <div className="navbar__left">
-          <IconButton>
-            <MenuIcon />
-          </IconButton>
-          <img
-            src="https://1000logos.net/wp-content/uploads/2021/05/Google-logo.png"
-            alt="Google Logo"
-            className="navbar__logo"
-          />{" "}
-          <span className="classroom">Classroom</span>
+          <a href="/dashboard">
+            <IconButton>
+              <MenuIcon />
+            </IconButton>
+            <img
+              src="https://1000logos.net/wp-content/uploads/2021/05/Google-logo.png"
+              alt="Google Logo"
+              className="navbar__logo"
+            />{" "}
+            <span className="classroom" style ={{display: "inline-block"}}>Classroom</span>
+          </a>
         </div>
         <div className="navbar__right">
           <IconButton
@@ -79,7 +80,7 @@ function Navbar() {
             keepMounted
             open={Boolean(anchorEl)}
             onClose={handleClose}
-            style={{ marginTop: '40px' }}
+            style={{ marginTop: "40px" }}
           >
             <MenuItem
               onClick={() => {

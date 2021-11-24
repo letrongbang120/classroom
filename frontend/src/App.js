@@ -30,7 +30,7 @@ function App() {
           path="/u/:userId"
           element={
             <React.Fragment>
-              {/* <Navbar /> */}
+              <Navbar />
               <Profile />
             </React.Fragment>
           }
