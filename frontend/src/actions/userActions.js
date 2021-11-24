@@ -59,11 +59,19 @@ export const getClassById = async (accountId, token) => {
 export const updateUser = async (username, studentId, phone, age, token) => {
   try {
     const ageNumber = Number(age);
-    console.log(token)
     const { data } = await axios.put("/account", { username, studentId, phone, age: ageNumber }, {
       headers: { Authorization: token }
     });
-    console.log(data);
+    localStorage.setItem("userSigninClassroom", JSON.stringify({
+      accountId: data.accountId,
+      age: data.age,
+      email: data.email,
+      phone: data.phone,
+      role: data.role,
+      studentId: data.studentId,
+      token: token,
+      username: data.username
+    }));
     return true;
   } catch (error) {
     return false;
