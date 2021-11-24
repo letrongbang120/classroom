@@ -10,7 +10,7 @@ require (
 	github.com/go-logr/zapr v0.4.0
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/mux v1.8.0
-	github.com/opentracing-contrib/go-gorilla v0.0.0-20190110000444-ced666783644
+	github.com/opentracing-contrib/go-gorilla v0.0.0-20190110000444-ced666783644 // indirect
 	github.com/opentracing-contrib/go-stdlib v1.0.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/reddit/jwt-go v3.2.1+incompatible
@@ -21,6 +21,7 @@ require (
 	go.uber.org/atomic v1.8.0 // indirect
 	go.uber.org/zap v1.17.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	google.golang.org/api v0.60.0
 	google.golang.org/grpc v1.42.0
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 )

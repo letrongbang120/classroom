@@ -16,6 +16,8 @@ import (
 type Account interface {
 	SignUp(ctx context.Context, req *models.Account) (*models.Account, error)
 	SignIn(ctx context.Context, req *models.Account) (*models.Account, string, error)
+	SignInByToken(ctx context.Context, req *models.Account) (*models.Account, string, error)
+	UpdateInfo(ctx context.Context, accountId string, req *models.Account) (*models.Account, error)
 	CheckAuth(ctx context.Context, accountId string) (*models.Account, error)
 }
 
@@ -68,7 +70,46 @@ func (d *accountDomain) SignIn(ctx context.Context, req *models.Account) (*model
 	return res, tkn.Token, nil
 }
 
+func (d *accountDomain) SignInByToken(ctx context.Context, req *models.Account) (*models.Account, string, error) {
+	data, err := token.VerifyGoogleIDToken(req.Token)
+	if err != nil {
+		return nil, "", err
+	}
+
+	res, err := d.accountRepository.FindByEmail(ctx, data.Email)
+	if err == errors.ErrEmailNotFound {
+		req.Email = data.Email
+		res, err = d.SignUp(ctx, req)
+		if err != nil {
+			return nil, "", err
+		}
+	}
+
+	tkn, err := d.authenticator.Generate(&requestinfo.Info{
+		AccountID: res.AccountID,
+	})
+
+	if err != nil {
+		return nil, "", status.Errorf(codes.Internal, "gen token %w", err)
+	}
+
+	return res, tkn.Token, nil
+}
+
 func (d *accountDomain) CheckAuth(ctx context.Context, accountId string) (*models.Account, error) {
+	res, err := d.accountRepository.FindByAccountId(ctx, accountId)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (d *accountDomain) UpdateInfo(ctx context.Context, accountId string, account *models.Account) (*models.Account, error) {
+	if err := d.accountRepository.UpdateInfo(ctx, accountId, account); err != nil {
+		return nil, err
+	}
+
 	res, err := d.accountRepository.FindByAccountId(ctx, accountId)
 	if err != nil {
 		return nil, err
