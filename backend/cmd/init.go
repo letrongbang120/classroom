@@ -138,7 +138,7 @@ func (s *srv) connectMongo() error {
 }
 
 func (s *srv) loadMailer() error {
-	s.mail = domain.NewMailer("go.normal.icontrol@gmail.com", "haopro123", "smtp.gmail.com", "587")
+	s.mail = domain.NewMailer("email@gmail.com", "password", "smtp.gmail.com", "587")
 	return nil
 }
 
