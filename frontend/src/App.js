@@ -8,6 +8,7 @@ import CoursePage from "./pages/CoursePage/CoursePage";
 import Navbar from "./components/Navbar/Navbar";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Profile from './components/Profile/Profile';
+import GradeStructure from "./pages/GradeStructure/GradeStructure";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             </React.Fragment>
           }
         />
+        <Route path="/grade/edit" element={<GradeStructure />} />
         <Route
           path="/u/:userId"
           element={

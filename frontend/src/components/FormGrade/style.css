@@ -1,0 +1,35 @@
+.form-grade {
+  display: flex;
+  flex-direction: column;
+  width: 700px;
+  margin: 5px auto;
+  padding: 15px;
+  border: 1px solid #c0c0c0;
+}
+
+.form-grade__item {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.form-grade__item-input {
+  width: 80%;
+}
+
+.btn {
+  color: #fff;
+  margin-top: 5px;
+}
+
+.btn-edit {
+  background-color: #0030b3;
+}
+
+.btn-delete {
+  background-color: #ca0000;
+}
+
+.btn-submit {
+  background-color: #1a9c00;
+}
