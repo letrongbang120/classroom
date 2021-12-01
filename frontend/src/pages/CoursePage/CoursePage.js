@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import {
   createLink,
   getClass,
@@ -174,7 +174,14 @@ export default function CoursePage() {
             {showExtend && (
               <div className="course-info__extend">
                 <h6>Topic: {course.theme}</h6>
-                <h6>Teacher: {members.filter(member => member.accountId === course.teacherId)[0].username}</h6>
+                <h6>
+                  Teacher:{" "}
+                  {
+                    members.filter(
+                      (member) => member.accountId === course.teacherId
+                    )[0].username
+                  }
+                </h6>
               </div>
             )}
           </div>
@@ -182,7 +189,17 @@ export default function CoursePage() {
             <div>
               <div className="container mt-5">
                 <div className="row">
-                  <div className="col-6">
+                  <div className="col-2">
+                    <button type="button" class="btn btn-secondary">
+                      <Link
+                        to={`/c/${courseId}/grade/add`}
+                        
+                      >
+                        <h4 className="text-right" style={{paddingTop: '5px'}}>Grade detail</h4>
+                      </Link>
+                    </button>
+                  </div>
+                  <div className="col-5">
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <h2 className="text-right">Invite</h2>
                     </div>
@@ -225,11 +242,15 @@ export default function CoursePage() {
                       >
                         Create invite link
                       </button>
-                      {link && <span className="mt-3" style={{ display: 'block' }}>{link}</span>}
+                      {link && (
+                        <span className="mt-3" style={{ display: "block" }}>
+                          {link}
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-5">
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <h2 className="text-right">Setting class</h2>
                     </div>

@@ -27,7 +27,7 @@ function App() {
             </React.Fragment>
           }
         />
-        <Route path="/grade/edit" element={<GradeStructure />} />
+        <Route path="/c/:courseId/grade/add" element={<GradeStructure />} />
         <Route
           path="/u/:userId"
           element={
