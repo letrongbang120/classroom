@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Profile from './components/Profile/Profile';
 import GradeStructure from "./pages/GradeStructure/GradeStructure";
 import People from './pages/People/People';
+import GradeBoard from './pages/GradeBoard/GradeBoard'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route exact path="/" element={<Home />} />
         <Route exact path="/c/:courseId" element={<CoursePage />} />
         <Route exact path="/r/:courseId" element={<People />} />
+        <Route exact path="/c/:courseId/grade" element={<GradeBoard />} />
         <Route
           path="/dashboard"
           element={
