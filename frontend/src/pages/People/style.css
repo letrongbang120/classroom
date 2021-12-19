@@ -1,0 +1,33 @@
+.course-info {
+  border: 0.1rem;
+  border-radius: 1rem;
+  -webkit-box-shadow: 0px 0px 16px -8px rgba(0, 0, 0, 0.68);
+  box-shadow: 0px 0px 16px -8px rgba(0, 0, 0, 0.68);
+  margin: 1rem auto;
+  width: 90%;
+}
+
+.course-info__inner {
+  font-size: larger;
+  padding-top: 5rem;
+  padding-left: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 1rem;
+  background-color: #2583ff;
+  color: #fff;
+}
+
+.course-info__extend {
+  background-color: #fff;
+  padding: 0.5rem;
+}
+
+.teachers {
+  width: 90%;
+  margin: 40px 40px 40px 40px;
+}
+
+.students {
+  width: 90%;
+  margin: 40px 40px 40px 40px;
+}

@@ -9,7 +9,7 @@ import {
   updateClass,
 } from "../../actions/classAction";
 import CourseHeader from "../../components/CourseHeader/CourseHeader";
-import "./styles.css";
+import "./style.css";
 import { useNavigate } from "react-router-dom";
 import { getUserById } from "../../actions/userActions";
 import { useForm } from "react-hook-form";
@@ -185,72 +185,23 @@ export default function CoursePage() {
               </div>
             )}
           </div>
-          {course.teacherId === user.accountId && (
-            <div>
-              <div className="container mt-5">
-                <div className="row">
-                  <div className="col-2">
-                    <button type="button" class="btn btn-secondary">
-                      <Link
-                        to={`/c/${courseId}/grade/add`}
-                        
-                      >
-                        <h4 className="text-right" style={{paddingTop: '5px'}}>Grade detail</h4>
-                      </Link>
-                    </button>
-                  </div>
-                  <div className="col-5">
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                      <h2 className="text-right">Invite</h2>
-                    </div>
-                    <form onSubmit={handleSubmit(submitSendEmail)}>
-                      <div>
-                        <label className="labels" htmlFor="invitation">
-                          Invite teacher/student by email
-                        </label>
-                        <input
-                          type="text"
-                          id="invitation"
-                          className="form-control"
-                          placeholder="Input email"
-                          {...register("email", {
-                            required: true,
-                            pattern:
-                              /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                          })}
-                        ></input>
-                        {errors.email?.type === "required" && (
-                          <span className="error">Empty email</span>
-                        )}
-                        {errors.email?.type === "pattern" && (
-                          <span className="error">Invalid email</span>
-                        )}
-                      </div>
-                      <div className="mt-3 text-center">
-                        <button
-                          className="btn btn-primary profile-button"
-                          type="submit"
-                        >
-                          Send invitation
-                        </button>
-                      </div>
-                    </form>
-                    <div className="mt-5">
-                      <button
-                        className="btn btn-primary profile-button"
-                        onClick={createLinkInvite}
-                      >
-                        Create invite link
-                      </button>
-                      {link && (
-                        <span className="mt-3" style={{ display: "block" }}>
-                          {link}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="col-5">
+          <div>
+            <div className="container mt-5">
+              <div className="row">
+                <div className="col-2">
+                  <button type="button" class="btn btn-secondary">
+                    <h4 className="text-right" style={{ paddingTop: "5px" }}>
+                      Grade detail
+                    </h4>
+                    <div>Bt1: 40%</div>
+                    <div>Bt2: 30%</div>
+                    <div>Bt3: 20%</div>
+                    <div>Bt4: 10%</div>
+                  </button>
+                </div>
+                <div className="col-4"></div>
+                {course.teacherId === user.accountId && (
+                  <div className="col-6">
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <h2 className="text-right">Setting class</h2>
                     </div>
@@ -339,41 +290,10 @@ export default function CoursePage() {
                       </div>
                     </form>
                   </div>
-                </div>
-              </div>
-
-              <div className="members">
-                <h2>Members in course</h2>
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Role</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {members &&
-                      members.map((member, index) => {
-                        return (
-                          <tr key={member.accountId}>
-                            <td>{index}</td>
-                            <td>{member.username}</td>
-                            <td>{member.email}</td>
-                            <td>
-                              {member.accountId === course.teacherId
-                                ? "Teacher"
-                                : "Student"}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
+                )}
               </div>
             </div>
-          )}
+          </div>
         </div>
       )}
     </React.Fragment>

@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar/Navbar";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Profile from './components/Profile/Profile';
 import GradeStructure from "./pages/GradeStructure/GradeStructure";
+import People from './pages/People/People';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route exact path="/register" element={<Register />} />
         <Route exact path="/" element={<Home />} />
         <Route exact path="/c/:courseId" element={<CoursePage />} />
+        <Route exact path="/r/:courseId" element={<People />} />
         <Route
           path="/dashboard"
           element={
