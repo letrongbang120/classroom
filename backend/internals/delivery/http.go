@@ -18,6 +18,7 @@ func NewHTTPHandler(
 	classDelivery ClassDelivery,
 	accountDelivery AccountDelivery,
 	invitationDelivery InvitationDelivery,
+	gradeDelivery GradeDelivery,
 	authenticator token.Authenticator,
 	accountDomain domain.Account,
 	classDomain domain.Class) http.Handler {
@@ -54,6 +55,9 @@ func NewHTTPHandler(
 	router.HandleFunc("/api/v1/upload", Adapt(http.HandlerFunc(classDelivery.UploadImage),
 		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("POST")
 
+	router.HandleFunc("/api/v1/upload/students/{classId}", Adapt(http.HandlerFunc(classDelivery.UploadStudentList),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("POST")
+
 	// invitation
 	router.HandleFunc("/api/v1/invitation", Adapt(http.HandlerFunc(invitationDelivery.GetLink),
 		CheckTeacher(authenticator, accountDomain, classDomain)).ServeHTTP).Methods("POST")
@@ -62,6 +66,30 @@ func NewHTTPHandler(
 		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("POST")
 
 	router.HandleFunc("/api/v1/class/join", Adapt(http.HandlerFunc(invitationDelivery.Join),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("POST")
+
+	// assignment
+	router.HandleFunc("/api/v1/assignment", Adapt(http.HandlerFunc(gradeDelivery.CreateAssignment),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("POST")
+	router.HandleFunc("/api/v1/assignment", Adapt(http.HandlerFunc(gradeDelivery.UpdateAssignment),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("PUT")
+	router.HandleFunc("/api/v1/assignment/detail", Adapt(http.HandlerFunc(gradeDelivery.GetAssignmentById),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("GET")
+	router.HandleFunc("/api/v1/assignment/list", Adapt(http.HandlerFunc(gradeDelivery.GetAssignmentList),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("GET")
+
+	// grade
+	router.HandleFunc("/api/v1/grade", Adapt(http.HandlerFunc(gradeDelivery.CreateGrade),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("POST")
+	router.HandleFunc("/api/v1/grade", Adapt(http.HandlerFunc(gradeDelivery.UpdateGrade),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("PUT")
+	router.HandleFunc("/api/v1/grade/detail", Adapt(http.HandlerFunc(gradeDelivery.GetGradeById),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("GET")
+	router.HandleFunc("/api/v1/grade/student", Adapt(http.HandlerFunc(gradeDelivery.GetGradeOfStudent),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("GET")
+	router.HandleFunc("/api/v1/grade/list", Adapt(http.HandlerFunc(gradeDelivery.GetGradeList),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("GET")
+	router.HandleFunc("/api/v1/grade/upload/{assignmentId}", Adapt(http.HandlerFunc(gradeDelivery.UploadGradeList),
 		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("POST")
 
 	// contract

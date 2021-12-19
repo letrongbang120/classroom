@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"TKPM/common/core"
 	"TKPM/common/errors"
 	"TKPM/internals/models"
 	"TKPM/internals/repository"
@@ -43,7 +44,8 @@ func (d *accountDomain) SignUp(ctx context.Context, req *models.Account) (*model
 	if err != nil {
 		return nil, err
 	}
-
+	
+	core.SetMapAccountStudent(res.AccountID, res.StudentID)
 	return &models.Account{
 		AccountID: res.AccountID,
 	}, nil

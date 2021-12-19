@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"TKPM/common/core"
 	"TKPM/configs"
 	"TKPM/internals/models"
 	"TKPM/internals/repository"
@@ -17,6 +18,7 @@ import (
 
 type Class interface {
 	UploadImage(ctx context.Context, data []byte, name string, size int64, storageConfig configs.Storage) (*string, error)
+	UploadStudentList(ctx context.Context, classId string, data [][]string) error
 	Create(ctx context.Context, class *models.Class) (*models.Class, error)
 	Update(ctx context.Context, class *models.Class) (*models.Class, error)
 	GetClassList(ctx context.Context, offset, limit int64) ([]*models.Class, error)
@@ -80,6 +82,23 @@ func (d *classDomain) Create(ctx context.Context, class *models.Class) (*models.
 	}
 
 	return res, nil
+}
+
+func (d *classDomain) UploadStudentList(ctx context.Context, classId string, data [][]string) error {
+	if len(data) == 0 {
+		return fmt.Errorf("invalid csv")
+	}
+	data = data[1:]
+	fmt.Println(data)
+	for _, v := range data {
+		_, err := d.AddStudent(ctx, classId, core.GetAccountID(v[0]))
+		if err != nil {
+			return err
+		}
+		fmt.Println(v[1], v[0])
+		core.SetMapFullnameStudent(v[1], v[0])
+	}
+	return nil
 }
 
 func (d *classDomain) AddStudent(ctx context.Context, classId, studentId string) (*models.Class, error) {

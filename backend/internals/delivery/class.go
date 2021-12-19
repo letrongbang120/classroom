@@ -16,6 +16,7 @@ import (
 
 type ClassDelivery interface {
 	UploadImage(w http.ResponseWriter, r *http.Request)
+	UploadStudentList(w http.ResponseWriter, r *http.Request)
 	Create(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)
 	GetClassList(w http.ResponseWriter, r *http.Request)
@@ -25,14 +26,36 @@ type ClassDelivery interface {
 
 type classDelivery struct {
 	classDomain   domain.Class
+	csvDomain     domain.Csv
 	storageConfig configs.Storage
 }
 
-func NewClassDelivery(classDomain domain.Class, storageConfig configs.Storage) ClassDelivery {
+func NewClassDelivery(classDomain domain.Class, csvDomain domain.Csv, storageConfig configs.Storage) ClassDelivery {
 	return &classDelivery{
 		classDomain:   classDomain,
+		csvDomain:     csvDomain,
 		storageConfig: storageConfig,
 	}
+}
+
+func (d *classDelivery) UploadStudentList(w http.ResponseWriter, r *http.Request) {
+	path := strings.Split(r.URL.Path, "/")
+	if len(path) < 6 {
+		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": "missing class id"})
+		return
+	}
+	data, err := d.csvDomain.ReadData(r.Body)
+	if err != nil {
+		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": "Invalid body"})
+		return
+	}
+
+	if err := d.classDomain.UploadStudentList(context.Background(), path[5], data); err != nil {
+		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"err ": err.Error()})
+		return
+	}
+
+	utils.ResponseWithJson(w, http.StatusOK, "upload student list successfully")
 }
 
 func (d *classDelivery) UploadImage(w http.ResponseWriter, r *http.Request) {

@@ -1,20 +1,24 @@
-package main
+package domain
 
 import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"net/http"
 )
 
-func main() {
-	http.HandleFunc("/csv", ReadCSVFromHttpRequest)
-	http.ListenAndServe(":8080", nil)
+type Csv interface {
+	ReadData(r io.Reader) ([][]string, error)
 }
 
-func ReadCSVFromHttpRequest(w http.ResponseWriter, req *http.Request) {
+type csvDomain struct{}
+
+func NewCsvDomain() Csv {
+	return &csvDomain{}
+}
+
+func (c *csvDomain) ReadData(r io.Reader) ([][]string, error) {
 	// parse POST body as csv
-	reader := csv.NewReader(req.Body)
+	reader := csv.NewReader(r)
 	reader.LazyQuotes = true
 	reader.FieldsPerRecord = -1
 	var results [][]string
@@ -26,13 +30,13 @@ func ReadCSVFromHttpRequest(w http.ResponseWriter, req *http.Request) {
 		}
 		if err != nil {
 			fmt.Println("err:: ", err)
-			return
+			return [][]string{}, err
 		}
 
 		// add record to result set
 		if len(record) > 1 {
+			results = append(results, record)
 		}
-		results = append(results, record)
 	}
-	// fmt.Println(results)
+	return results, nil
 }
