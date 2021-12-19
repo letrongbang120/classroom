@@ -60,7 +60,7 @@ func (d *gradeDelivery) UploadGradeList(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	utils.ResponseWithJson(w, http.StatusOK, "upload student list successfully")
+	utils.ResponseWithJson(w, http.StatusOK, "upload grade list successfully")
 }
 
 func (d *gradeDelivery) CreateGrade(w http.ResponseWriter, r *http.Request) {
