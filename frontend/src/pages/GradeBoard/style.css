@@ -31,3 +31,25 @@
   width: 90%;
   margin: 40px 40px 40px 40px;
 }
+
+.assignment-upload {
+  border-bottom: 1px #c0c0c0 solid;
+  padding: 10px 25px;
+  margin: 5px auto;
+}
+
+.input {
+  overflow-x: hidden;
+}
+
+.grade-board {
+  margin: 20px auto;
+  width: 80%;
+}
+
+.score {
+  padding: 2px 5px;
+  background-color: #2583ff;
+  color: #fff;
+  margin-right: 5px;
+}

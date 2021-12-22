@@ -1,34 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Table } from "react-bootstrap";
 import { useParams, Link } from "react-router-dom";
 import {
-  createLink,
   getClass,
-  inviteByEmail,
   joinClass,
-  updateClass,
 } from "../../actions/classAction";
 import CourseHeader from "../../components/CourseHeader/CourseHeader";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
-import { getUserById } from "../../actions/userActions";
-import { useForm } from "react-hook-form";
+import { CSVLink } from "react-csv";
+import { getAssignmentList, getGradeList, uploadGradeList } from "../../actions/gradeActions";
+import { Table } from "react-bootstrap";
 
 export default function GradeBoard() {
   const [course, setCourse] = useState();
   const [message, setMessage] = useState("");
   const { courseId } = useParams();
-  const [members, setMembers] = useState([]);
-  const [link, setLink] = useState("");
-  const [join, setJoin] = useState(false);
-  const [teachers, setTeachers] = useState([]);
-  const [students, setStudents] = useState([]);
-  const {
-    register: register1,
-    handleSubmit: handleSubmit1,
-    setValue: setValue1,
-    formState: { errors: errors1 },
-  } = useForm();
 
   const [user, setUser] = useState({});
   const navigate = useNavigate();
@@ -45,10 +31,6 @@ export default function GradeBoard() {
       const result = await getClass(courseId, user.token);
       if (result) {
         setCourse(result);
-        setValue1("name", result.name);
-        setValue1("description", result.description);
-        setValue1("theme", result.theme);
-        setValue1("room", result.room);
       } else {
         setMessage("Class ID is not found.");
       }
@@ -56,7 +38,7 @@ export default function GradeBoard() {
     if (user.token) {
       func();
     }
-  }, [courseId, user, setValue1]);
+  }, [courseId, user]);
 
   useEffect(() => {
     if (course && user) {
@@ -65,7 +47,6 @@ export default function GradeBoard() {
           const res = await joinClass(course.classId, user.token);
           if (res) {
             setCourse(res);
-            setJoin(true);
           }
         };
         invite();
@@ -78,7 +59,6 @@ export default function GradeBoard() {
             const res = await joinClass(course.classId, user.token);
             if (res) {
               setCourse(res);
-              setJoin(true);
             }
           };
           invite();
@@ -87,103 +67,56 @@ export default function GradeBoard() {
     }
   }, [course, user]);
 
+  const [listAssignment, setListAssignment] = useState([]);
   useEffect(() => {
-    if (course) {
-      const insertTeacher = async () => {
-        const res = await getUserById(course.teacherId);
-        setMembers((prevMembers) => {
-          if (prevMembers.includes(res)) {
-            return prevMembers;
-          } else {
-            return [...prevMembers, res];
-          }
-        });
-      };
-      insertTeacher();
-      if (course.studentIds) {
-        for (const studentId of course.studentIds) {
-          const insertStudent = async (id) => {
-            const res = await getUserById(id);
-            setMembers((prevMembers) => [...prevMembers, res]);
-          };
-          insertStudent(studentId);
-        }
-      }
-    }
-  }, [course]);
-
-  useEffect(() => {
-    if (course) {
-      const insertTeacher = async () => {
-        const res = await getUserById(course.teacherId);
-        setTeachers((prevMembers) => {
-          if (prevMembers.includes(res)) {
-            return prevMembers;
-          } else {
-            return [...prevMembers, res];
-          }
-        });
-      };
-      insertTeacher();
-    }
-  }, [course, user]);
-
-  useEffect(() => {
-    if (course) {
-      if (course.studentIds) {
-        for (const studentId of course.studentIds) {
-          const insertStudent = async (id) => {
-            const res = await getUserById(id);
-            setStudents((prevMembers) => [...prevMembers, res]);
-          };
-          insertStudent(studentId);
-        }
-      }
-    }
-  }, [course, user]);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-  const submitSendEmail = (data) => {
-    const send = async () => {
-      const res = await inviteByEmail([data.email], course.classId, user.token);
+    const getAssignments = async () => {
+      const res = await getAssignmentList(user.token);
       if (res) {
-        alert("invited successful !!!");
+        setListAssignment(res);
       } else {
-        alert("invited fail");
+        alert("Can't get list Assignment");
       }
-    };
-    send();
-  };
-
-  const createLinkInvite = async () => {
-    const res = await createLink(course.classId, user.token);
-    setLink(res);
-  };
-
-  const submitUpdateClass = (data) => {
-    const update = async () => {
-      const res = await updateClass(
-        course.classId,
-        data.name,
-        data.description,
-        data.theme,
-        data.room,
-        user.token
-      );
-      if (res) {
-        alert("success. Reload to see the change");
-      } else {
-        alert("update fail");
-      }
-    };
-    if (window.confirm("Do you want to update?")) {
-      update();
     }
-  };
+    getAssignments();
+  }, [user]);
+
+  const getHeaderAssignment = (assignment) => {
+    const header = [];
+    header.unshift("studentID");
+    for (let i = 0; i < assignment.scoreQuantity; i++) {
+      header.push(`Grade ${i + 1}`);
+    }
+    return header;
+  }
+
+  const [gradeFile, setGradeFile] = useState();
+  const [assignment, setAssignment] = useState();
+
+  const changeFileHandler = (e, assignmentId) => {
+    setGradeFile(e.target.files[0]);
+    setAssignment(assignmentId);
+  }
+
+  const uploadGrade = async () => {
+    const res = await uploadGradeList(assignment, gradeFile, user.token)
+    if (res) {
+      alert("Your grade has been already uploaded success.");
+    }
+    else {
+      alert("Upload FAIL!!!");
+    }
+  }
+
+  const [gradeBoard, setGradeBoard] = useState([]);
+  const getListGrade = async (assignment) => {
+    const res = await getGradeList(user.token);
+    if (res) {
+      const list = res.filter((item) => item.assignmentId === assignment.assignmentId);
+      setGradeBoard(list);
+    } else {
+      alert("Get this grade board FAIL!!!");
+    }
+  }
 
   return (
     <React.Fragment>
@@ -191,7 +124,6 @@ export default function GradeBoard() {
       {course && (
         <div>
           <CourseHeader course={course} user={user} />
-
           <div>
             {course.teacherId === user.accountId && (
               <div className="container mt-5">
@@ -212,7 +144,19 @@ export default function GradeBoard() {
                         assignment
                       </h4>
                     </div>
-                    <button className="btn btn-primary">Download</button>
+                    {listAssignment.map((item) => {
+                      return (
+                        <CSVLink
+                          key={item.assignmentId}
+                          className="btn-download"
+                          data={[]}
+                          headers={[getHeaderAssignment(item)]}
+                          filename="grade_webnc"
+                        >
+                          {item.description}
+                        </CSVLink>
+                      )
+                    })}
                   </div>
 
                   <div className="col-3 text-center">
@@ -221,21 +165,81 @@ export default function GradeBoard() {
                         Upload grades of all students
                       </h4>
                     </div>
-                    <input className="input" type="file" />
+                    {
+                      listAssignment.map((item) => {
+                        return (
+                          <div
+                            key={item.assignmentId}
+                            className="assignment-upload"
+                          >
+                            <h5>{item.description}</h5>
+                            <input
+                              className="input"
+                              type="file"
+                              filetypes={'.csv'}
+                              onChange={(e) => { changeFileHandler(e, item.assignmentId); }}
+                            />
+                          </div>
+                        )
+                      })
+                    }
+                    <button
+                      onClick={uploadGrade}
+                      className="btn-download"
+                    >
+                      Add
+                    </button>
                   </div>
 
                   <div className="col-3">
                     <div className="d-flex justify-content-between align-items-center">
                       <h4 className="text-center">Export Grade Board</h4>
                     </div>
-                    <div style={{marginLeft: '70px'}}>
-                    <button className="btn btn-primary">Export</button>
-                    </div>
-                    
+                    {listAssignment.map((item) => {
+                      return (
+                        <div
+                          key={item.assignmentId}
+                          style={{ marginLeft: '70px' }}
+                        >
+                          <button
+                            className="btn btn-primary"
+                            onClick={() => { getListGrade(item) }}
+                          >{item.description}</button>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               </div>
             )}
+            <div>
+              {gradeBoard.length > 0 &&
+                <Table className="grade-board">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Student ID</th>
+                      <th>Score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gradeBoard.map((item, index) => {
+                      return (
+                        <tr key={index}>
+                          <td>{index}</td>
+                          <td>{item?.studentId}</td>
+                          <td>{item?.scores.map((score, index) => {
+                            return <span key={index} className="score">{score}</span>
+
+                          })}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+
+                </Table>
+              }
+            </div>
           </div>
         </div>
       )}

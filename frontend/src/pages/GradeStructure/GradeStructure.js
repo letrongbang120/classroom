@@ -1,30 +1,24 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import FormGrade from '../../components/FormGrade/FormGrade'
 import Grade from '../../components/Grade/Grade';
 import './style.css'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
+import { createAssignment } from '../../actions/gradeActions';
+import { useNavigate } from 'react-router-dom';
 
 export default function GradeStructure() {
-  const initGrades = [
-    {
-      title: "bt1",
-      detail: 10
-    },
-    {
-      title: "bt2",
-      detail: 20
-    },
-    {
-      title: "bt3",
-      detail: 30
-    },
-    {
-      title: "bt4",
-      detail: 40
-    },
-  ]
-  const [grades, setGrades] = useState(initGrades);
+  const [user, setUser] = useState({});
+  const [name, setName] = useState('');
+  const [grades, setGrades] = useState([]);
 
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (localStorage.getItem("userSigninClassroom")) {
+      setUser(JSON.parse(localStorage.getItem("userSigninClassroom")));
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
   const addGrade = (grade) => {
     setGrades(prevState => [
       {
@@ -52,8 +46,34 @@ export default function GradeStructure() {
     setGrades(items);
   }
 
+  const saveGrade = async () => {
+    const sum = grades.reduce((a, c) => a + c.detail, 0);
+    console.log(user.token);
+    if (sum !== 100) {
+      alert("Total detail of grades must be 100. Please check again!!!");
+    }
+    else {
+      const res = await createAssignment(name, grades.length, user.token);
+      if (res) {
+        console.log(res);
+      }
+      else {
+        alert('Create assignment fail. Something was wrong!!!');
+      }
+    }
+  }
+
   return (
     <div>
+      <div className='control-name'>
+        <label htmlFor='name'>Name of Assignment</label>
+        <input
+          className='name-assignment'
+          type='text'
+          value={name}
+          onChange={e => { setName(e.target.value) }}
+        />
+      </div>
       {grades.length > 0 &&
         <DragDropContext onDragEnd={handleOnGradeEnd}>
           <Droppable droppableId="grades">
@@ -92,6 +112,13 @@ export default function GradeStructure() {
 
       }
       <FormGrade addGrade={addGrade} />
+      <div className='control-grade'>
+        <button
+          className='btn-save-grade'
+          onClick={saveGrade}
+        >SAVE</button>
+      </div>
+
     </div>
   )
 }

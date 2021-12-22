@@ -38,7 +38,6 @@ export const signout = () => {
 export const getUserById = async (userId) => {
   try {
     const { data } = await axios.get(`/account?accountId=${userId}`);
-    console.log(data);
     return data;
   } catch (error) {
     return false;
@@ -73,6 +72,17 @@ export const updateUser = async (username, studentId, phone, age, token) => {
       username: data.username
     }));
     return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+export const uploadStudentList = async (classId, file, token) => {
+  try {
+    const { data } = await axios.post(`/upload/students/${classId}`, file, {
+      headers: { Authorization: token }
+    });
+    return data;
   } catch (error) {
     return false;
   }

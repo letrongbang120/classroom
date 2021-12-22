@@ -1,0 +1,24 @@
+.control-name {
+  display: flex;
+  justify-content: space-between;
+  width: 50%;
+  margin: 5px auto;
+}
+
+.name-assignment {
+  width: 70%;
+}
+
+.control-grade {
+  text-align: center;
+  width: 100%;
+}
+
+.btn-save-grade {
+  background-color: #1a9c00;
+  color: #fff;
+  border: none;
+  padding: 5px;
+  width: 50%;
+  margin: 15px 0;
+}

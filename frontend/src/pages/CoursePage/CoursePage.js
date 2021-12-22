@@ -13,6 +13,7 @@ import "./style.css";
 import { useNavigate } from "react-router-dom";
 import { getUserById } from "../../actions/userActions";
 import { useForm } from "react-hook-form";
+import { getAssignmentById, getAssignmentList } from "../../actions/gradeActions";
 
 export default function CoursePage() {
   const [showExtend, setShowExtend] = useState(false);
@@ -154,6 +155,28 @@ export default function CoursePage() {
     }
   };
 
+  const [listAssignment, setListAssignment] = useState([]);
+  useEffect(() => {
+    const getAssignments = async () => {
+      const res = await getAssignmentList(user.token);
+      if (res) {
+        setListAssignment(res);
+      } else {
+        alert("Can't get list Assignment");
+      }
+    }
+    getAssignments();
+  }, [user]);
+
+  const onClickAssignment = async (assignmentId) => {
+    const res = await getAssignmentById(assignmentId, user.token);
+    if (res) {
+      alert(res.description);
+    } else {
+      alert("Can't get this assignment!!!");
+    }
+  }
+
   return (
     <React.Fragment>
       {message && <span className="error">{message}</span>}
@@ -189,15 +212,22 @@ export default function CoursePage() {
             <div className="container mt-5">
               <div className="row">
                 <div className="col-2">
-                  <button type="button" class="btn btn-secondary">
-                    <h4 className="text-right" style={{ paddingTop: "5px" }}>
-                      Grade detail
-                    </h4>
-                    <div>Bt1: 40%</div>
-                    <div>Bt2: 30%</div>
-                    <div>Bt3: 20%</div>
-                    <div>Bt4: 10%</div>
-                  </button>
+                  <h3>List Assignment</h3>
+                  {listAssignment?.length > 0 && listAssignment.map((item) => {
+                    return (
+                      <button
+                        key={item.assignmentId}
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => { onClickAssignment(item.assignmentId) }}
+                      >
+                        <h4 className="text-right" style={{ paddingTop: "5px" }}>
+                          {item.description}
+                        </h4>
+                        <div>Score quantity: {item.scoreQuantity}</div>
+                      </button>)
+                  })}
+
                 </div>
                 <div className="col-4"></div>
                 {course.teacherId === user.accountId && (

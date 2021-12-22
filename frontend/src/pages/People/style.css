@@ -31,3 +31,9 @@
   width: 90%;
   margin: 40px 40px 40px 40px;
 }
+
+.btn-download {
+  background-color: #2583ff;
+  padding: 10px 25px;
+  border-radius: 8px;
+}

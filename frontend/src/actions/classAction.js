@@ -17,7 +17,6 @@ export const getClass = async (id, token) => {
     const { data } = await axios.get(`/class?classId=${id}`, {
       headers: { Authorization: token }
     });
-    console.log(data);
     return data;
   } catch (error) {
     return false;

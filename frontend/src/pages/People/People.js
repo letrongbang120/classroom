@@ -11,8 +11,9 @@ import {
 import CourseHeader from "../../components/CourseHeader/CourseHeader";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
-import { getUserById } from "../../actions/userActions";
+import { getUserById, uploadStudentList } from "../../actions/userActions";
 import { useForm } from "react-hook-form";
+import { CSVLink } from 'react-csv'
 
 export default function People() {
   const [course, setCourse] = useState();
@@ -185,6 +186,21 @@ export default function People() {
     }
   };
 
+  const [studentsFile, setStudentsFile] = useState();
+
+  const changeFileHandler = (e, assignmentId) => {
+    setStudentsFile(e.target.files[0]);
+  }
+
+  const uploadStudents = async () => {
+    const res = await uploadStudentList(courseId, studentsFile, user.token);
+    if (res) {
+      alert("Your list of student has been already uploaded success.")
+    }
+    else {
+      alert("Upload FAIL!!!");
+    }
+  }
   return (
     <React.Fragment>
       {message && <span className="error">{message}</span>}
@@ -200,9 +216,15 @@ export default function People() {
                     <div className="d-flex justify-content-between align-items-center">
                       <h4 className="text-right">Download template csv file</h4>
                     </div>
-                    <button className="btn btn-primary">
+                    <CSVLink
+                      className="btn-download"
+                      data={[[]]}
+                      headers={[['studentID', 'fullName']]}
+                      filename="class_webnc"
+                      target="_blank"
+                    >
                       Download
-                    </button>
+                    </CSVLink>
                   </div>
 
                   <div className="col-3 text-center">
@@ -211,7 +233,18 @@ export default function People() {
                         Upload list students with template file
                       </h4>
                     </div>
-                    <input className="input" type="file" />
+                    <input
+                      className="input"
+                      type="file"
+                      filetypes={'.csv'}
+                      onChange={changeFileHandler}
+                    />
+                    <button
+                      className="btn-download"
+                      onClick={uploadStudents}
+                    >
+                      Add
+                    </button>
                   </div>
 
                   <div className="col-3 text-center">
