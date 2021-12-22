@@ -92,6 +92,7 @@ export default function GradeBoard() {
   const [gradeFile, setGradeFile] = useState();
   const [assignment, setAssignment] = useState();
 
+
   const changeFileHandler = (e, assignmentId) => {
     setGradeFile(e.target.files[0]);
     setAssignment(assignmentId);
@@ -108,11 +109,25 @@ export default function GradeBoard() {
   }
 
   const [gradeBoard, setGradeBoard] = useState([]);
+  const [showGradeBoard, setShowGradeBoard] = useState(false);
+  const [dataGradeBoard, setDataGradeBoard] = useState([]);
+
   const getListGrade = async (assignment) => {
     const res = await getGradeList(user.token);
     if (res) {
       const list = res.filter((item) => item.assignmentId === assignment.assignmentId);
+      let data = [];
+      for (const student of list) {
+        let row = [];
+        row[0] = student.studentId;
+        for (let i = 0; i < student.scores.length; i++) {
+          row[i + 1] = Number(student.scores[i]);
+        }
+        data.push(row);
+      }
       setGradeBoard(list);
+      setShowGradeBoard(true);
+      setDataGradeBoard(data);
     } else {
       alert("Get this grade board FAIL!!!");
     }
@@ -199,12 +214,22 @@ export default function GradeBoard() {
                       return (
                         <div
                           key={item.assignmentId}
-                          style={{ marginLeft: '70px' }}
+                          className="assignment-grade-board"
                         >
                           <button
                             className="btn btn-primary"
                             onClick={() => { getListGrade(item) }}
-                          >{item.description}</button>
+                          >
+                            {item.description}
+                          </button>
+                          {showGradeBoard && <CSVLink
+                            headers={[getHeaderAssignment(item)]}
+                            data={dataGradeBoard}
+                            filename="grade_webnc"
+                            className="link-download"
+                          >
+                            Download now
+                          </CSVLink>}
                         </div>
                       )
                     })}

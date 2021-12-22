@@ -42,6 +42,18 @@
   overflow-x: hidden;
 }
 
+.assignment-grade-board {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.link-download {
+  color: #2583ff;
+  font-style: italic;
+}
+
 .grade-board {
   margin: 20px auto;
   width: 80%;
