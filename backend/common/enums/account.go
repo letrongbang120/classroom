@@ -6,8 +6,9 @@ const (
 	_ RoleIndex = iota
 	User
 	Admin
+	SuperAdmin
 )
 
 func (r RoleIndex) String() string {
-	return [...]string{"User", "Admin"}[r-1]
+	return [...]string{"User", "Admin", "SuperAdmin"}[r-1]
 }

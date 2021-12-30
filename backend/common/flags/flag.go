@@ -33,7 +33,7 @@ var (
 		Name:   "database_name",
 		Usage:  "Database name",
 		EnvVar: "DATABASE_NAME",
-		Value:  "hotel",
+		Value:  "classroom",
 	}
 
 	// MongoHostFlag ...

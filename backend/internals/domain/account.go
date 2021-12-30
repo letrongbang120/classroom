@@ -2,6 +2,7 @@ package domain
 
 import (
 	"TKPM/common/core"
+	"TKPM/common/enums"
 	"TKPM/common/errors"
 	"TKPM/internals/models"
 	"TKPM/internals/repository"
@@ -16,10 +17,13 @@ import (
 
 type Account interface {
 	SignUp(ctx context.Context, req *models.Account) (*models.Account, error)
+	SignUpAdmin(ctx context.Context, req *models.Account) (*models.Account, error)
 	SignIn(ctx context.Context, req *models.Account) (*models.Account, string, error)
 	SignInByToken(ctx context.Context, req *models.Account) (*models.Account, string, error)
 	UpdateInfo(ctx context.Context, accountId string, req *models.Account) (*models.Account, error)
 	CheckAuth(ctx context.Context, accountId string) (*models.Account, error)
+	GetAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error)
+	GetAdminAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error)
 }
 
 type accountDomain struct {
@@ -39,13 +43,29 @@ func (d *accountDomain) SignUp(ctx context.Context, req *models.Account) (*model
 	if res != nil {
 		return nil, err
 	}
-
+	req.Role = enums.User.String()
 	res, err = d.accountRepository.Create(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	core.SetMapAccountStudent(res.AccountID, res.StudentID)
+	return &models.Account{
+		AccountID: res.AccountID,
+	}, nil
+}
+
+func (d *accountDomain) SignUpAdmin(ctx context.Context, req *models.Account) (*models.Account, error) {
+	res, err := d.accountRepository.FindByEmail(ctx, req.Email)
+	if res != nil {
+		return nil, err
+	}
+	req.Role = enums.Admin.String()
+	res, err = d.accountRepository.Create(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
 	return &models.Account{
 		AccountID: res.AccountID,
 	}, nil
@@ -113,6 +133,24 @@ func (d *accountDomain) UpdateInfo(ctx context.Context, accountId string, accoun
 	}
 
 	res, err := d.accountRepository.FindByAccountId(ctx, accountId)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (d *accountDomain) GetAdminAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error) {
+	res, err := d.accountRepository.GetAdminAccountList(ctx, offset, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (d *accountDomain) GetAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error) {
+	res, err := d.accountRepository.GetAccountList(ctx, offset, limit)
 	if err != nil {
 		return nil, err
 	}

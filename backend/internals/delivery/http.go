@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"TKPM/common/enums"
 	"TKPM/internals/domain"
 	"TKPM/internals/models"
 	"TKPM/pkg/token"
@@ -19,12 +20,22 @@ func NewHTTPHandler(
 	accountDelivery AccountDelivery,
 	invitationDelivery InvitationDelivery,
 	gradeDelivery GradeDelivery,
+	reviewDelivery ReviewDelivery,
 	authenticator token.Authenticator,
 	accountDomain domain.Account,
 	classDomain domain.Class) http.Handler {
 
 	router := mux.NewRouter()
+	// admin
+	router.HandleFunc("/api/v1/accounts/admin", Adapt(http.HandlerFunc(accountDelivery.GetAdminAccountList),
+		CheckSuperAdmin(authenticator, accountDomain)).ServeHTTP).Methods("GET")
+
+	router.HandleFunc("/api/v1/sign-up/admin", Adapt(http.HandlerFunc(accountDelivery.SignUpAdmin),
+		CheckSuperAdmin(authenticator, accountDomain)).ServeHTTP).Methods("POST")
+
 	// account
+	router.HandleFunc("/api/v1/accounts", accountDelivery.GetAccountList).Methods("GET")
+
 	router.HandleFunc("/api/v1/sign-up", accountDelivery.SignUp).Methods("POST")
 
 	router.HandleFunc("/api/v1/sign-in", accountDelivery.SignIn).Methods("POST")
@@ -92,6 +103,24 @@ func NewHTTPHandler(
 	router.HandleFunc("/api/v1/grade/upload/{assignmentId}", Adapt(http.HandlerFunc(gradeDelivery.UploadGradeList),
 		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("POST")
 
+	// review
+	router.HandleFunc("/api/v1/review", Adapt(http.HandlerFunc(reviewDelivery.Create),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("POST")
+
+	router.HandleFunc("/api/v1/review", Adapt(http.HandlerFunc(reviewDelivery.Update),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("PUT")
+
+	router.HandleFunc("/api/v1/review/list", Adapt(http.HandlerFunc(reviewDelivery.GetReviewList),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("GET")
+
+	router.HandleFunc("/api/v1/review", Adapt(http.HandlerFunc(reviewDelivery.GetReviewById),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("GET")
+
+	router.HandleFunc("/api/v1/review/assignment", Adapt(http.HandlerFunc(reviewDelivery.GetReviewByAssignmentId),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("GET")
+
+	// admin
+
 	// contract
 	// _ = router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 	// route.Handler(
@@ -158,6 +187,39 @@ func CheckAuth(authenticator token.Authenticator, accountDomain domain.Account) 
 			if _, err := accountDomain.CheckAuth(context.Background(), payload.AccountID); err != nil {
 				responseWithJson(w, http.StatusBadRequest, map[string]interface{}{
 					"message": fmt.Errorf("unable to get user by id: %w", err).Error(),
+				})
+				return
+			}
+
+			ctx := context.WithValue(req.Context(), "account_id", payload.AccountID)
+			next.ServeHTTP(w, req.WithContext(ctx))
+		})
+	}
+}
+
+func CheckSuperAdmin(authenticator token.Authenticator, accountDomain domain.Account) Adapter {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			token := req.Header.Get("Authorization")
+			payload, err := authenticator.Verify(token)
+			if err != nil {
+				responseWithJson(w, http.StatusBadRequest, map[string]interface{}{
+					"message": fmt.Errorf("unable to verify token: %w", err).Error(),
+				})
+				return
+			}
+
+			account, err := accountDomain.CheckAuth(context.Background(), payload.AccountID)
+			if err != nil {
+				responseWithJson(w, http.StatusBadRequest, map[string]interface{}{
+					"message": fmt.Errorf("unable to get user by id: %w", err).Error(),
+				})
+				return
+			}
+
+			if account.Role != enums.SuperAdmin.String() {
+				responseWithJson(w, http.StatusBadRequest, map[string]interface{}{
+					"message": fmt.Errorf("only super admin can access").Error(),
 				})
 				return
 			}

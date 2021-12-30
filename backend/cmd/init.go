@@ -55,11 +55,13 @@ type srv struct {
 	gradeDomain      domain.Grade
 	assignmentDomain domain.Assignment
 	csvDomain        domain.Csv
+	reviewDomain     domain.Review
 
 	classDelivery      delivery.ClassDelivery
 	accountDelivery    delivery.AccountDelivery
 	invitationDelivery delivery.InvitationDelivery
 	gradeDelivery      delivery.GradeDelivery
+	reviewDelivery     delivery.ReviewDelivery
 
 	tracer opentracing.Tracer
 }
@@ -128,7 +130,7 @@ func (s *srv) loadLogger() error {
 
 func (s *srv) connectMongo() error {
 	s.mgoClientOptions = options.Client().ApplyURI("mongodb://my_database:27017")
-	//s.mgoClientOptions = options.Client().ApplyURI("mongodb://localhost:27017/my_classroom_db")
+	// s.mgoClientOptions = options.Client().ApplyURI("mongodb://localhost:27017/my_classroom_db")
 	// connect to mongoDb
 	var err error
 	s.mgoClient, err = mongo.Connect(context.TODO(), s.mgoClientOptions)
@@ -179,6 +181,7 @@ func (s *srv) loadDomain() error {
 	s.assignmentDomain = domain.NewAssignmentDomain(repository.NewAssignmentRepository(s.mgoDB.Collection(models.AssignmentCollection)))
 	s.gradeDomain = domain.NewGradeDomain(repository.NewGradeRepository(s.mgoDB.Collection(models.GradeCollection)))
 	s.csvDomain = domain.NewCsvDomain()
+	s.reviewDomain = domain.NewReviewDomain(repository.NewReviewRepository(s.mgoDB.Collection(models.ReviewCollection)))
 	s.logger.Info("load domain successfull ")
 	return nil
 }
@@ -188,6 +191,7 @@ func (s *srv) loadDelivery() error {
 	s.classDelivery = delivery.NewClassDelivery(s.classDomain, s.csvDomain, s.cfg.Storage)
 	s.invitationDelivery = delivery.NewInvitationDelivery(s.classDomain, s.invitationDomain)
 	s.gradeDelivery = delivery.NewGradeDelivery(s.gradeDomain, s.assignmentDomain, s.csvDomain, s.cfg.Storage)
+	s.reviewDelivery = delivery.NewReviewDelivery(s.reviewDomain)
 	s.logger.Info("load delivery successfull ")
 	return nil
 }
@@ -199,7 +203,7 @@ func (s *srv) loadAuthenticator() error {
 }
 
 func (s *srv) startHTTPServer() {
-	handler := delivery.NewHTTPHandler(s.classDelivery, s.accountDelivery, s.invitationDelivery, s.gradeDelivery, s.authenticator, s.accountDomain, s.classDomain)
+	handler := delivery.NewHTTPHandler(s.classDelivery, s.accountDelivery, s.invitationDelivery, s.gradeDelivery, s.reviewDelivery, s.authenticator, s.accountDomain, s.classDomain)
 	server := &http.Server{
 		Addr:    s.cfg.HTTP.Host + ":" + s.cfg.HTTP.Port,
 		Handler: delivery.AllowCORS(handler),

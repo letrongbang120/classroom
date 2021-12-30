@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -17,6 +18,8 @@ type Account interface {
 	FindByEmail(ctx context.Context, email string) (*models.Account, error)
 	FindByAccountId(ctx context.Context, accountId string) (*models.Account, error)
 	UpdateInfo(ctx context.Context, accountId string, account *models.Account) error
+	GetAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error)
+	GetAdminAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error)
 }
 
 type accountRepository struct {
@@ -32,7 +35,6 @@ func NewAccountRepository(coll *mongo.Collection) Account {
 func (r *accountRepository) Create(ctx context.Context, account *models.Account) (*models.Account, error) {
 	err := account.HashPassword()
 	account.AccountID = uuid.New().String()
-	account.Role = enums.User.String()
 	if err != nil {
 		return nil, err
 	}
@@ -68,4 +70,56 @@ func (r *accountRepository) UpdateInfo(ctx context.Context, accountId string, ac
 		"$set": account,
 	})
 	return err
+}
+
+func (r *accountRepository) GetAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error) {
+	result := []*models.Account{}
+
+	opt := options.FindOptions{
+		Skip:  &offset,
+		Limit: &limit,
+	}
+	cur, err := r.coll.Find(ctx, &models.Account{
+		Role: enums.User.String(),
+	}, &opt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+
+	if err := cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (r *accountRepository) GetAdminAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error) {
+	result := []*models.Account{}
+
+	opt := options.FindOptions{
+		Skip:  &offset,
+		Limit: &limit,
+	}
+	cur, err := r.coll.Find(ctx, &models.Account{
+		Role: enums.Admin.String(),
+	}, &opt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+
+	if err := cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
