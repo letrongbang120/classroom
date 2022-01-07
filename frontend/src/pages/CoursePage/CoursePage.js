@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Table } from "react-bootstrap";
-import { useParams, Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   createLink,
   getClass,
   inviteByEmail,
   joinClass,
-  updateClass,
+  updateClass
 } from "../../actions/classAction";
+import { getAssignmentById, getAssignmentList } from "../../actions/gradeActions";
+import { getUserById } from "../../actions/userActions";
 import CourseHeader from "../../components/CourseHeader/CourseHeader";
 import "./style.css";
-import { useNavigate } from "react-router-dom";
-import { getUserById } from "../../actions/userActions";
-import { useForm } from "react-hook-form";
-import { getAssignmentById, getAssignmentList } from "../../actions/gradeActions";
 
 export default function CoursePage() {
   const [showExtend, setShowExtend] = useState(false);

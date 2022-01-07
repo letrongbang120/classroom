@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
-import { useParams, Link } from "react-router-dom";
+import { CSVLink } from 'react-csv';
+import { useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   createLink,
   getClass,
   inviteByEmail,
   joinClass,
-  updateClass,
+  updateClass
 } from "../../actions/classAction";
+import { getUserById, uploadStudentList } from "../../actions/userActions";
 import CourseHeader from "../../components/CourseHeader/CourseHeader";
 import "./style.css";
-import { useNavigate } from "react-router-dom";
-import { getUserById, uploadStudentList } from "../../actions/userActions";
-import { useForm } from "react-hook-form";
-import { CSVLink } from 'react-csv'
 
 export default function People() {
   const [course, setCourse] = useState();

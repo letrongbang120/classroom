@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import { useForm } from "react-hook-form";
 import { GoogleLogin } from "react-google-login";
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { signin, signInByEmail } from "../../actions/userActions";
 
 function Login() {
@@ -109,11 +109,11 @@ function Login() {
           >
             <small>
               Don't have an account?
-              <a href="/register" style={{ marginLeft: "10px", color: "#2583ff" }}>
+              <Link to="/register" style={{ marginLeft: "10px", color: "#2583ff" }}>
                 Sign up
-              </a>
+              </Link>
             </small>
-            <a href="/" style={{ color: "#2583ff" }}>Forgot your password?</a>
+            <Link to="/" style={{ color: "#2583ff" }}>Forgot your password?</Link>
           </div>
           <div style={{ textAlign: "center" }}>
             <GoogleLogin
