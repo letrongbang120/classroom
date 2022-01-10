@@ -11,6 +11,7 @@ import JoinClass from "../JoinClass/JoinClass";
 import "./Navbar.css";
 import { useNavigate } from "react-router";
 import { signout } from "../../actions/userActions";
+import { Link } from 'react-router-dom';
 
 function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -49,7 +50,7 @@ function Navbar() {
       <JoinClass />
       <nav className="navbar">
         <div className="navbar__left">
-          <a href="/dashboard">
+          <Link to="/dashboard">
             <IconButton>
               <MenuIcon />
             </IconButton>
@@ -59,7 +60,7 @@ function Navbar() {
               className="navbar__logo"
             />{" "}
             <span className="classroom" style={{ display: "inline-block" }}>Classroom</span>
-          </a>
+          </Link>
         </div>
         <div className="navbar__right">
           <IconButton

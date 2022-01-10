@@ -7,10 +7,19 @@ import Register from "./pages/Register/Register";
 import CoursePage from "./pages/CoursePage/CoursePage";
 import Navbar from "./components/Navbar/Navbar";
 import Dashboard from "./pages/Dashboard/Dashboard";
-import Profile from './components/Profile/Profile';
+import Profile from "./components/Profile/Profile";
 import GradeStructure from "./pages/GradeStructure/GradeStructure";
-import People from './pages/People/People';
-import GradeBoard from './pages/GradeBoard/GradeBoard'
+import People from "./pages/People/People";
+import GradeBoard from "./pages/GradeBoard/GradeBoard";
+import SuperAdmin from "./pages/SuperAdmin/SuperAdmin";
+import CreateAdmin from "./components/CreateAdmin/CreateAdmin";
+import AdminDetails from "./components/AdminDetail/AdminDetails";
+import AdminPage from "./pages/AdminPage/AdminPage";
+import SuperAdminHeader from "./components/SuperAdminHeader/SuperAdminHeader";
+import AdminHeader from "./components/AdminHeader/AdminHeader";
+import UserDetails from "./components/UserDetails/UserDetails";
+import Classes from "./components/Classes/Classes";
+import ClassDetails from "./components/ClassDetails/ClassDetails";
 
 function App() {
   return (
@@ -41,6 +50,64 @@ function App() {
             </React.Fragment>
           }
         />
+
+        {/* SuperAdmin Route */}
+        <Route exact path="/superadmin" element={<SuperAdmin />} />
+        <Route
+          exact
+          path="/superadmin/add"
+          element={
+            <React.Fragment>
+              <SuperAdminHeader />
+              <CreateAdmin />
+            </React.Fragment>
+          }
+        />
+        <Route
+          exact
+          path="/superadmin/details"
+          element={
+            <React.Fragment>
+              <SuperAdminHeader />
+              <AdminDetails />
+            </React.Fragment>
+          }
+        />
+        {/* End SuperAdmin Route */}
+
+        {/* Admin Route */}
+        <Route exact path="/admin/users" element={<AdminPage />} />
+        <Route
+          exact
+          path="/admin/user/details"
+          element={
+            <React.Fragment>
+              <AdminHeader />
+              <UserDetails />
+            </React.Fragment>
+          }
+        />
+        <Route
+          exact
+          path="/admin/classes"
+          element={
+            <React.Fragment>
+              <AdminHeader />
+              <Classes />
+            </React.Fragment>
+          }
+        />
+        <Route
+          exact
+          path="/admin/class/details"
+          element={
+            <React.Fragment>
+              <AdminHeader />
+              <ClassDetails />
+            </React.Fragment>
+          }
+        />
+        {/* End Admin Route */}
       </Routes>
     </div>
   );

@@ -1,5 +1,6 @@
 import React from 'react'
-import { Container, Nav, Navbar } from 'react-bootstrap'
+import { Container, Nav, Navbar } from 'react-bootstrap';
+import { Link } from "react-router-dom";
 
 export default function CourseHeader(props) {
   return (
@@ -7,9 +8,9 @@ export default function CourseHeader(props) {
       <Container>
         <Navbar.Brand href="/dashboard" style={{fontWeight: 'bold'}}>Dashboard</Navbar.Brand>
         <Nav>
-          <Nav.Link href={`/c/${props.course.classId}`} style={{fontWeight: 'bold', marginRight:'5px'}}>Stream</Nav.Link>
-          <Nav.Link href={`/c/${props.course.classId}/grade`} style={{fontWeight: 'bold', marginRight:'5px'}}>Gradeboard</Nav.Link>
-          <Nav.Link href={`/r/${props.course.classId}`} style={{fontWeight: 'bold', marginRight:'5px'}}>People</Nav.Link>
+          <Link to={`/c/${props.course.classId}`} style={{color:"black", fontWeight: 'bold', marginRight:'30px'}}>Stream</Link>
+          <Link to={`/c/${props.course.classId}/grade`} style={{color:"black", fontWeight: 'bold', marginRight:'30px'}}>Gradeboard</Link>
+          <Link to={`/r/${props.course.classId}`} style={{color:"black", fontWeight: 'bold', marginRight:'30px'}}>People</Link>
         </Nav>
         <Nav>
           <Nav.Link href={`/u/${props.user.accountId}`} style={{fontWeight: 'bold'}}>{props.user.username} </Nav.Link>
