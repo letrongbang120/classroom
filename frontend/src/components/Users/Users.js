@@ -10,16 +10,19 @@ export default function Users() {
       fullname: "Danh Hoàng",
       email: "danhhoang@gmail.com",
       createdTime: "13/9/2021",
+      ban: true
     },
     {
       fullname: "Danh Hoàng123",
       email: "danhhoang123@gmail.com",
       createdTime: "15/9/2021",
+      ban: false
     },
     {
       fullname: "Danh Hoàng16",
       email: "danhhoang16@gmail.com",
       createdTime: "18/9/2021",
+      ban: true
     },
   ];
   return (
@@ -99,7 +102,10 @@ export default function Users() {
                       </Link>
                     </td>
                     <td>
-                        <input type="checkbox"/>
+                        {user.ban ? 
+                          <Button style={{color:"blue"}}>Unban</Button>
+                          : <Button style={{color:"red"}}>Ban</Button>
+                        }
                     </td>
                   </tr>
                 );
