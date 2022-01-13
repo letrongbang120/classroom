@@ -1,29 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 import SuperAdminHeader from "../../components/SuperAdminHeader/SuperAdminHeader";
-import SortIcon from "@mui/icons-material/Sort";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { getListAdmin } from "../../actions/adminAction";
 
 export default function SuperAdmin() {
-  const dummyAdmins = [
-    {
-      fullname: "Danh Hoàng",
-      email: "danhhoang@gmail.com",
-      createdTime: "13/9/2021",
-    },
-    {
-      fullname: "Danh Hoàng123",
-      email: "danhhoang123@gmail.com",
-      createdTime: "15/9/2021",
-    },
-    {
-      fullname: "Danh Hoàng16",
-      email: "danhhoang16@gmail.com",
-      createdTime: "18/9/2021",
-    },
-  ];
+  const navigate = useNavigate();
+  const [user, setUser] = useState();
+  useEffect(() => {
+    if (localStorage.getItem("userSigninClassroom")) {
+      setUser(JSON.parse(localStorage.getItem("userSigninClassroom")));
+      if (JSON.parse(localStorage.getItem("userSigninClassroom")).role !== "SuperAdmin") {
+        navigate('/dashboard');
+        alert("You are not superadmin !!");
+      }
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  const [admins, setAdmins] = useState([]);
+  useEffect(() => {
+    if (user) {
+      const getAdminList = async () => {
+        const res = await getListAdmin(user.token);
+        console.log(res);
+        if (res) {
+          setAdmins(res);
+        }
+      };
+      getAdminList();
+    }
+  }, [user])
   return (
     <div>
       {/* Check role before navigate to SuperAdmin... */}
@@ -72,21 +82,16 @@ export default function SuperAdmin() {
           <thead>
             <tr>
               <th>Index</th>
-              <th>Fullname</th>
               <th>Email</th>
-              <th>
-                <div>
-                  Created Time
-                  <Button>
-                    <SortIcon />
-                  </Button>
-                </div>
-              </th>
+              <th>Student ID</th>
+              <th>Phone</th>
+              <th>Age</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {dummyAdmins &&
-              dummyAdmins.map((admin, index) => {
+            {admins &&
+              admins.map((admin, index) => {
                 return (
                   <tr key={index}>
                     <td>
@@ -96,18 +101,26 @@ export default function SuperAdmin() {
                     </td>
                     <td>
                       <Link to="/superadmin/details" style={{ color: "black" }}>
-                        {admin.fullname}
-                      </Link>
-                    </td>
-                    <td>
-                      <Link to="/superadmin/details" style={{ color: "black" }}>
                         {admin.email}
                       </Link>
                     </td>
                     <td>
                       <Link to="/superadmin/details" style={{ color: "black" }}>
-                        {admin.createdTime}
+                        {admin.studentId}
                       </Link>
+                    </td>
+                    <td>
+                      <Link to="/superadmin/details" style={{ color: "black" }}>
+                        {admin.phone}
+                      </Link>
+                    </td>
+                    <td>
+                      <Link to="/superadmin/details" style={{ color: "black" }}>
+                        {admin.age}
+                      </Link>
+                    </td>
+                    <td>
+                      <button className="btn btn-danger">Delete</button>
                     </td>
                   </tr>
                 );

@@ -6,7 +6,6 @@ import ClassCard from "../../components/ClassCard/ClassCard";
 
 function Dashboard() {
   const [courses, setCourses] = useState([]);
-
   const [user, setUser] = useState({});
   const navigate = useNavigate();
   useEffect(() => {
@@ -18,6 +17,9 @@ function Dashboard() {
   }, [navigate]);
 
   useEffect(() => {
+    if (user.role === "SuperAdmin") {
+      navigate('/superadmin')
+    }
     const func = async () => {
       const res = await getClassById(user.accountId, user.token);
       if (res) {
@@ -25,7 +27,7 @@ function Dashboard() {
       }
     }
     func();
-  }, [user]);
+  }, [user, navigate]);
 
   return (
     <>
