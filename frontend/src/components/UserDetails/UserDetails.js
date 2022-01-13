@@ -1,5 +1,8 @@
 import React from "react";
 import "../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import Button from "@mui/material/Button";
+
+const ban = false;
 
 function UserDetails() {
   return (
@@ -17,7 +20,12 @@ function UserDetails() {
                   <label for="ban" style={{ marginRight: "10px" }}>
                     Ban/Lock
                   </label>
-                  <input type="checkbox" id="ban" name="ban"/>
+                  {/* Truyền user vào rồi thay ban = user.ban (Xoá const ở trên) */}
+                  {ban ? (
+                    <Button style={{ color: "blue" }}>Unban</Button>
+                  ) : (
+                    <Button style={{ color: "red" }}>Ban</Button>
+                  )}
                 </div>
 
                 <div className="col-md-12">
