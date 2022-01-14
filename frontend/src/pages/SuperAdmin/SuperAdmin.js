@@ -4,7 +4,7 @@ import SuperAdminHeader from "../../components/SuperAdminHeader/SuperAdminHeader
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import { Link, useNavigate } from "react-router-dom";
-import { getListAdmin } from "../../actions/adminAction";
+import { getListAdmin } from "../../actions/superAdminAction";
 
 export default function SuperAdmin() {
   const navigate = useNavigate();

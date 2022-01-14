@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import "../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
-import { createAdmin } from "../../actions/adminAction";
+import { createAdmin } from "../../actions/superAdminAction";
 
 function CreateAdmin() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();

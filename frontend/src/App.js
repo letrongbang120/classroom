@@ -79,7 +79,7 @@ function App() {
         <Route exact path="/admin/users" element={<AdminPage />} />
         <Route
           exact
-          path="/admin/user/details"
+          path="/admin/user/:userId"
           element={
             <React.Fragment>
               <AdminHeader />

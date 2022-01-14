@@ -1,27 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
-import SortIcon from "@mui/icons-material/Sort";
-import Button from "@mui/material/Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { getListUser } from "../../actions/adminActions";
 
 export default function Users() {
-  const dummyUsers = [
-    {
-      fullname: "Danh Hoàng",
-      email: "danhhoang@gmail.com",
-      createdTime: "13/9/2021",
-    },
-    {
-      fullname: "Danh Hoàng123",
-      email: "danhhoang123@gmail.com",
-      createdTime: "15/9/2021",
-    },
-    {
-      fullname: "Danh Hoàng16",
-      email: "danhhoang16@gmail.com",
-      createdTime: "18/9/2021",
-    },
-  ];
+  const navigate = useNavigate();
+  const [user, setUser] = useState();
+  useEffect(() => {
+    if (localStorage.getItem("userSigninClassroom")) {
+      setUser(JSON.parse(localStorage.getItem("userSigninClassroom")));
+      if (
+        JSON.parse(localStorage.getItem("userSigninClassroom")).role !== "SuperAdmin" &&
+        JSON.parse(localStorage.getItem("userSigninClassroom")).role !== "Admin"
+      ) {
+        navigate('/dashboard');
+        alert("You are not Admin !!");
+      }
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    const getUsers = async () => {
+      const res = await getListUser();
+      console.log(res)
+      if (res) {
+        setUsers(res);
+      }
+    }
+    getUsers();
+  }, [])
   return (
     <div>
       <div className="admin mt-5" style={{ margin: "0 50px" }}>
@@ -62,44 +72,43 @@ export default function Users() {
               <th>Index</th>
               <th>Fullname</th>
               <th>Email</th>
-              <th>
-                <div>
-                  Created Time
-                  <Button>
-                    <SortIcon />
-                  </Button>
-                </div>
-              </th>
+              <th>Phone</th>
+              <th>Age</th>
               <th>Ban/Lock</th>
             </tr>
           </thead>
           <tbody>
-            {dummyUsers &&
-              dummyUsers.map((user, index) => {
+            {users &&
+              users.map((user, index) => {
                 return (
                   <tr key={index}>
                     <td>
-                      <Link to="/admin/user/details" style={{ color: "black" }}>
+                      <Link to={`/admin/user/${user.accountId}`} style={{ color: "black" }}>
                         {index + 1}
                       </Link>
                     </td>
                     <td>
-                      <Link to="/admin/user/details" style={{ color: "black" }}>
-                        {user.fullname}
+                      <Link to={`/admin/user/${user.accountId}`} style={{ color: "black" }}>
+                        {user.username}
                       </Link>
                     </td>
                     <td>
-                      <Link to="/admin/user/details" style={{ color: "black" }}>
+                      <Link to={`/admin/user/${user.accountId}`} style={{ color: "black" }}>
                         {user.email}
                       </Link>
                     </td>
                     <td>
-                      <Link to="/admin/user/details" style={{ color: "black" }}>
-                        {user.createdTime}
+                      <Link to={`/admin/user/${user.accountId}`} style={{ color: "black" }}>
+                        {user.phone}
                       </Link>
                     </td>
                     <td>
-                        <input type="checkbox"/>
+                      <Link to={`/admin/user/${user.accountId}`} style={{ color: "black" }}>
+                        {user.age}
+                      </Link>
+                    </td>
+                    <td>
+                      <input type="checkbox" />
                     </td>
                   </tr>
                 );
