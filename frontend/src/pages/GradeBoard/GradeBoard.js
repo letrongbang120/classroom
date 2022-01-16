@@ -73,19 +73,15 @@ export default function GradeBoard() {
       const res = await getAssignmentList(user.token);
       if (res) {
         setListAssignment(res);
-      } else {
-        alert("Can't get list Assignment");
       }
     }
     getAssignments();
   }, [user]);
 
-  const getHeaderAssignment = (assignment) => {
+  const getHeaderAssignment = () => {
     const header = [];
     header.unshift("studentID");
-    for (let i = 0; i < assignment.scoreQuantity; i++) {
-      header.push(`Grade ${i + 1}`);
-    }
+    header.push("Grade");
     return header;
   }
 
@@ -159,19 +155,14 @@ export default function GradeBoard() {
                         assignment
                       </h4>
                     </div>
-                    {listAssignment.map((item) => {
-                      return (
-                        <CSVLink
-                          key={item.assignmentId}
-                          className="btn-download"
-                          data={[]}
-                          headers={[getHeaderAssignment(item)]}
-                          filename="grade_webnc"
-                        >
-                          {item.description}
-                        </CSVLink>
-                      )
-                    })}
+                    <CSVLink
+                      className="btn-download"
+                      data={[]}
+                      headers={[getHeaderAssignment()]}
+                      filename="grade_webnc"
+                    >
+                      Download
+                    </CSVLink>
                   </div>
 
                   <div className="col-3 text-center">
