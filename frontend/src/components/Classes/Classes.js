@@ -1,24 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 import { Table } from "react-bootstrap";
 import SortIcon from "@mui/icons-material/Sort";
 import Button from "@mui/material/Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { getListClass } from "../../actions/adminActions";
 
 export default function Classes() {
-  const dummyClasses = [
-    {
-      className: "Xác Suất Thống Kê",
-      createdTime: "13/9/2021",
-    },
-    {
-      className: "Web",
-      createdTime: "15/9/2021",
-    },
-    {
-      className: "Web NC",
-      createdTime: "18/9/2021",
-    },
-  ];
+  const navigate = useNavigate();
+  const [user, setUser] = useState();
+  useEffect(() => {
+    if (localStorage.getItem("userSigninClassroom")) {
+      setUser(JSON.parse(localStorage.getItem("userSigninClassroom")));
+      if (JSON.parse(localStorage.getItem("userSigninClassroom")).role !== "SuperAdmin" &&
+        JSON.parse(localStorage.getItem("userSigninClassroom")).role !== "Admin") {
+        navigate('/dashboard');
+        alert("You are not superadmin !!");
+      }
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
+  const [classes, setClasses] = useState([]);
+  useEffect(() => {
+    if (user) {
+      const getClass = async () => {
+        const res = await getListClass(user.token);
+        if (res) {
+          setClasses(res);
+        }
+      }
+      getClass();
+    }
+
+  }, [navigate, user]);
+
   return (
     <div>
       <div className="admin mt-5" style={{ margin: "0 50px" }}>
@@ -47,7 +63,7 @@ export default function Classes() {
               <th>Class Name</th>
               <th>
                 <div>
-                  Created Time
+                  Theme
                   <Button>
                     <SortIcon />
                   </Button>
@@ -56,23 +72,23 @@ export default function Classes() {
             </tr>
           </thead>
           <tbody>
-            {dummyClasses &&
-              dummyClasses.map((cls, index) => {
+            {classes &&
+              classes.map((cls, index) => {
                 return (
                   <tr key={index}>
                     <td>
-                      <Link to="/admin/class/details" style={{ color: "black" }}>
+                      <Link to={`/admin/class/${cls.classId}`} style={{ color: "black" }}>
                         {index + 1}
                       </Link>
                     </td>
                     <td>
-                      <Link to="/admin/class/details" style={{ color: "black" }}>
-                        {cls.className}
+                      <Link to={`/admin/class/${cls.classId}`} style={{ color: "black" }}>
+                        {cls.name}
                       </Link>
                     </td>
                     <td>
-                      <Link to="/admin/user/details" style={{ color: "black" }}>
-                        {cls.createdTime}
+                      <Link to={`/admin/class/${cls.classId}`} style={{ color: "black" }}>
+                        {cls.theme}
                       </Link>
                     </td>
                   </tr>

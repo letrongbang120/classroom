@@ -1,7 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import "../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import { getClass } from "../../actions/classAction";
 
 function ClassDetails() {
+  const { classId } = useParams();
+  const navigate = useNavigate();
+  const [user, setUser] = useState();
+  useEffect(() => {
+    if (localStorage.getItem("userSigninClassroom")) {
+      setUser(JSON.parse(localStorage.getItem("userSigninClassroom")));
+      if (JSON.parse(localStorage.getItem("userSigninClassroom")).role !== "SuperAdmin" &&
+        JSON.parse(localStorage.getItem("userSigninClassroom")).role !== "Admin") {
+        navigate('/dashboard');
+        alert("You are not superadmin !!");
+      }
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  const [data, setData] = useState({});
+  useEffect(() => {
+    if (user) {
+      const getClassInfo = async () => {
+        const res = await getClass(classId, user.token);
+        if (res) {
+          setData(res);
+        }
+      }
+      getClassInfo();
+    }
+  }, [user, classId])
   return (
     <div>
       <div className="container rounded bg-white ">
@@ -24,7 +54,7 @@ function ClassDetails() {
                     name="fullname"
                     className="form-control"
                     placeholder="Fullname"
-                    value="Web NC"
+                    value={data && data.name}
                   />
                 </div>
 
@@ -38,7 +68,7 @@ function ClassDetails() {
                     name="description"
                     className="form-control"
                     placeholder="Description"
-                    value="Phát triển Web Nâng cao"
+                    value={data && data.description}
                   />
                 </div>
 
@@ -52,7 +82,7 @@ function ClassDetails() {
                     name="topic"
                     className="form-control"
                     placeholder="Topic"
-                    value="WebNC[18/3]"
+                    value={data && data.theme}
                   />
                 </div>
 

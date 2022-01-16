@@ -99,7 +99,7 @@ function App() {
         />
         <Route
           exact
-          path="/admin/class/details"
+          path="/admin/class/:classId"
           element={
             <React.Fragment>
               <AdminHeader />

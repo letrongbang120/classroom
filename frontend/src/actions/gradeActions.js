@@ -1,8 +1,8 @@
 import axios from "axios"
 
-export const createAssignment = async (description, scoreQuantity, token) => {
+export const createAssignment = async (description, scores, classId, token) => {
   try {
-    const { data } = await axios.post("/assignment", { description, scoreQuantity }, {
+    const { data } = await axios.post("/assignment", { scores, description, classId }, {
       headers: { Authorization: token }
     });
     return data;
@@ -28,6 +28,17 @@ export const getAssignmentById = async (assignmentId, token) => {
       headers: { Authorization: token }
     });
     return data;
+  } catch (error) {
+    return false;
+  }
+}
+
+export const getAssignmentByClassId = async (classId, token) => {
+  try {
+    const { data } = await axios.get(`/assignment/classId?classId=${classId}`, {
+      headers: { Authorization: token }
+    });
+    return data[0];
   } catch (error) {
     return false;
   }

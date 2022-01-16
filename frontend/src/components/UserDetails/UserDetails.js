@@ -8,7 +8,6 @@ function UserDetails() {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm({});
 
   const { userId } = useParams();
-  console.log(userId);
   useEffect(() => {
     const getUser = async () => {
       const result = await getUserById(userId);

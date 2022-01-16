@@ -20,6 +20,9 @@ function Dashboard() {
     if (user.role === "SuperAdmin") {
       navigate('/superadmin')
     }
+    if (user.role === "Admin") {
+      navigate('/admin/users')
+    }
     const func = async () => {
       const res = await getClassById(user.accountId, user.token);
       if (res) {

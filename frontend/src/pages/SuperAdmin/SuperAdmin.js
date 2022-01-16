@@ -26,7 +26,6 @@ export default function SuperAdmin() {
     if (user) {
       const getAdminList = async () => {
         const res = await getListAdmin(user.token);
-        console.log(res);
         if (res) {
           setAdmins(res);
         }

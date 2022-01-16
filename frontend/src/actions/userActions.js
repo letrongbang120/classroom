@@ -87,3 +87,16 @@ export const uploadStudentList = async (classId, file, token) => {
     return false;
   }
 }
+
+export const banUser = async (ban, token) => {
+  try {
+    console.log(ban)
+    const { data } = await axios.put('/account', { block: !ban }, {
+      headers: { Authorization: token }
+    })
+    console.log(data)
+    return true;
+  } catch (error) {
+    return false;
+  }
+}

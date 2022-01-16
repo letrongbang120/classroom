@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { getListUser } from "../../actions/adminActions";
+import { banUser } from "../../actions/userActions";
 
 export default function Users() {
   const navigate = useNavigate();
-  const [user, setUser] = useState();
+  const [admin, setAdmin] = useState();
   useEffect(() => {
     if (localStorage.getItem("userSigninClassroom")) {
-      setUser(JSON.parse(localStorage.getItem("userSigninClassroom")));
+      setAdmin(JSON.parse(localStorage.getItem("userSigninClassroom")));
       if (
         JSON.parse(localStorage.getItem("userSigninClassroom")).role !== "SuperAdmin" &&
         JSON.parse(localStorage.getItem("userSigninClassroom")).role !== "Admin"
@@ -25,13 +26,22 @@ export default function Users() {
   useEffect(() => {
     const getUsers = async () => {
       const res = await getListUser();
-      console.log(res)
       if (res) {
         setUsers(res);
       }
     }
     getUsers();
-  }, [])
+  }, []);
+
+  const banUserHandler = async (ban, token) => {
+    const res = await banUser(ban, token);
+    if (res) {
+      alert("Success")
+    }
+    else {
+      alert("Fail");
+    }
+  }
   return (
     <div>
       <div className="admin mt-5" style={{ margin: "0 50px" }}>
@@ -108,7 +118,16 @@ export default function Users() {
                       </Link>
                     </td>
                     <td>
-                      <input type="checkbox" />
+                      {user.block ?
+                        <button
+                          className="btn btn-success"
+                          onClick={() => { banUserHandler(user.block, admin.token) }}
+                        >Unban</button>
+                        : <button
+                          className="btn btn-danger"
+                          onClick={() => { banUserHandler(user.block, admin.token) }}
+                        >Ban</button>
+                      }
                     </td>
                   </tr>
                 );

@@ -6,7 +6,7 @@ import {
   joinClass,
   updateClass
 } from "../../actions/classAction";
-import { getAssignmentById, getAssignmentList } from "../../actions/gradeActions";
+import { getAssignmentByClassId, getAssignmentById, getAssignmentList } from "../../actions/gradeActions";
 import { getUserById } from "../../actions/userActions";
 import CourseHeader from "../../components/CourseHeader/CourseHeader";
 import "./style.css";
@@ -128,25 +128,18 @@ export default function CoursePage() {
     }
   };
 
-  const [listAssignment, setListAssignment] = useState([]);
+  const [assignment, setAssignment] = useState({});
   useEffect(() => {
-    const getAssignments = async () => {
-      const res = await getAssignmentList(user.token);
-      if (res) {
-        setListAssignment(res);
+    if (user.token) {
+      const getAssignment = async () => {
+        const res = await getAssignmentByClassId(courseId, user.token);
+        if (res) {
+          setAssignment(res);
+        }
       }
+      getAssignment();
     }
-    getAssignments();
-  }, [user]);
-
-  const onClickAssignment = async (assignmentId) => {
-    const res = await getAssignmentById(assignmentId, user.token);
-    if (res) {
-      alert(res.description);
-    } else {
-      alert("Can't get this assignment!!!");
-    }
-  }
+  }, [user, courseId]);
 
   return (
     <React.Fragment>
@@ -183,15 +176,17 @@ export default function CoursePage() {
             <div className="container mt-5">
               <div className="row">
                 <div className="col-2">
-                  <button type="button" class="btn btn-secondary">
+                  {assignment.description ? <button type="button" className="btn btn-secondary">
                     <h4 className="text-right" style={{ paddingTop: "5px" }}>
-                      Grade detail
+                      {assignment.description}
                     </h4>
-                    <div>Bt1: 40%</div>
-                    <div>Bt2: 30%</div>
-                    <div>Bt3: 20%</div>
-                    <div>Bt4: 10%</div>
-                  </button>
+                    {assignment.scores.map((item) => {
+                      return <div key={item.name}>{item.name}: {item.composition}%</div>
+                    })}
+                  </button> :
+                    <a className="btn btn-primary" href={`/c/${courseId}/grade/add`}>Add Grade Stucture</a>
+                  }
+
                 </div>
                 <div className="col-4"></div>
                 {course.teacherId === user.accountId && (
