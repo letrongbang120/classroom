@@ -6,7 +6,7 @@ import {
   joinClass,
   updateClass
 } from "../../actions/classAction";
-import { getAssignmentByClassId, getAssignmentById, getAssignmentList } from "../../actions/gradeActions";
+import { getAssignmentByClassId } from "../../actions/gradeActions";
 import { getUserById } from "../../actions/userActions";
 import CourseHeader from "../../components/CourseHeader/CourseHeader";
 import "./style.css";

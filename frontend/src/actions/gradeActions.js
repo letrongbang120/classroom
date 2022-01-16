@@ -46,7 +46,6 @@ export const getAssignmentByClassId = async (classId, token) => {
 
 export const uploadGradeList = async (assignmentId, gradeFile, token) => {
   try {
-    console.log(assignmentId)
     const { data } = await axios.post(`/grade/upload/${assignmentId}`, gradeFile, {
       headers: { Authorization: token }
     });

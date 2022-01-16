@@ -8,7 +8,7 @@ import CourseHeader from "../../components/CourseHeader/CourseHeader";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
 import { CSVLink } from "react-csv";
-import { getAssignmentList, getGradeList, uploadGradeList } from "../../actions/gradeActions";
+import { getAssignmentByClassId, getGradeList, uploadGradeList } from "../../actions/gradeActions";
 import { Table } from "react-bootstrap";
 
 export default function GradeBoard() {
@@ -67,65 +67,64 @@ export default function GradeBoard() {
     }
   }, [course, user]);
 
-  const [listAssignment, setListAssignment] = useState([]);
+  const [assignmentDetail, setAssignmentDetail] = useState({});
   useEffect(() => {
-    const getAssignments = async () => {
-      const res = await getAssignmentList(user.token);
-      if (res) {
-        setListAssignment(res);
+    if (user.token) {
+      const getAssignment = async () => {
+        const res = await getAssignmentByClassId(courseId, user.token);
+        if (res) {
+          setAssignmentDetail(res);
+        }
       }
+      getAssignment();
     }
-    getAssignments();
-  }, [user]);
+  }, [user, courseId]);
 
-  const getHeaderAssignment = () => {
+
+  const getHeaderAssignment = (assignment) => {
     const header = [];
     header.unshift("studentID");
-    header.push("Grade");
+    for (let i = 0; i < assignment.scores.length; i++) {
+      header.push(`${assignment.scores[i].name}`);
+    }
     return header;
   }
 
   const [gradeFile, setGradeFile] = useState();
-  const [assignment, setAssignment] = useState();
 
 
-  const changeFileHandler = (e, assignmentId) => {
+  const changeFileHandler = (e) => {
     setGradeFile(e.target.files[0]);
-    setAssignment(assignmentId);
   }
+
+  const [dataGradeBoard, setDataGradeBoard] = useState([]);
+  const [gradeBoard, setGradeBoard] = useState([]);
 
   const uploadGrade = async () => {
-    const res = await uploadGradeList(assignment, gradeFile, user.token)
-    if (res) {
-      alert("Your grade has been already uploaded success.");
-    }
-    else {
-      alert("Upload FAIL!!!");
-    }
-  }
-
-  const [gradeBoard, setGradeBoard] = useState([]);
-  const [showGradeBoard, setShowGradeBoard] = useState(false);
-  const [dataGradeBoard, setDataGradeBoard] = useState([]);
-
-  const getListGrade = async (assignment) => {
-    const res = await getGradeList(user.token);
-    if (res) {
-      const list = res.filter((item) => item.assignmentId === assignment.assignmentId);
-      let data = [];
-      for (const student of list) {
-        let row = [];
-        row[0] = student.studentId;
-        for (let i = 0; i < student.scores.length; i++) {
-          row[i + 1] = Number(student.scores[i]);
+    if (assignmentDetail.assignmentId) {
+      console.log(assignmentDetail)
+      const res = await uploadGradeList(assignmentDetail.assignmentId, gradeFile, user.token)
+      if (res) {
+        alert("Your grade has been already uploaded success.");
+        const resData = await getGradeList(user.token);
+        if (resData) {
+          const list = resData.filter((item) => item.assignmentId === assignmentDetail.assignmentId);
+          let data = [];
+          for (const student of list) {
+            let row = [];
+            row[0] = student.studentId;
+            for (let i = 0; i < student.scores.length; i++) {
+              row[i + 1] = Number(student.scores[i]);
+            }
+            data.push(row);
+          }
+          setDataGradeBoard(data);
+          setGradeBoard(list);
         }
-        data.push(row);
       }
-      setGradeBoard(list);
-      setShowGradeBoard(true);
-      setDataGradeBoard(data);
-    } else {
-      alert("Get this grade board FAIL!!!");
+      else {
+        alert("Upload FAIL!!!");
+      }
     }
   }
 
@@ -143,7 +142,7 @@ export default function GradeBoard() {
                     <div className="d-flex justify-content-between align-items-center">
                       <h4 className="text-right">Edit grade an assignments</h4>
                     </div>
-                    <button type="button" class="btn btn-primary">
+                    <button type="button" className="btn btn-primary">
                       <Link to={`/c/${courseId}/grade/add`}>Edit</Link>
                     </button>
                   </div>
@@ -155,14 +154,15 @@ export default function GradeBoard() {
                         assignment
                       </h4>
                     </div>
-                    <CSVLink
+                    {assignmentDetail.scores && <CSVLink
                       className="btn-download"
                       data={[]}
-                      headers={[getHeaderAssignment()]}
+                      headers={[getHeaderAssignment(assignmentDetail)]}
                       filename="grade_webnc"
                     >
                       Download
-                    </CSVLink>
+                    </CSVLink>}
+
                   </div>
 
                   <div className="col-3 text-center">
@@ -172,22 +172,17 @@ export default function GradeBoard() {
                       </h4>
                     </div>
                     {
-                      listAssignment.map((item) => {
-                        return (
-                          <div
-                            key={item.assignmentId}
-                            className="assignment-upload"
-                          >
-                            <h5>{item.description}</h5>
-                            <input
-                              className="input"
-                              type="file"
-                              filetypes={'.csv'}
-                              onChange={(e) => { changeFileHandler(e, item.assignmentId); }}
-                            />
-                          </div>
-                        )
-                      })
+                      assignmentDetail && <div
+                        className="assignment-upload"
+                      >
+                        <h5>{assignmentDetail.description}</h5>
+                        <input
+                          className="input"
+                          type="file"
+                          filetypes={'.csv'}
+                          onChange={(e) => { changeFileHandler(e) }}
+                        />
+                      </div>
                     }
                     <button
                       onClick={uploadGrade}
@@ -201,29 +196,14 @@ export default function GradeBoard() {
                     <div className="d-flex justify-content-between align-items-center">
                       <h4 className="text-center">Export Grade Board</h4>
                     </div>
-                    {listAssignment.map((item) => {
-                      return (
-                        <div
-                          key={item.assignmentId}
-                          className="assignment-grade-board"
-                        >
-                          <button
-                            className="btn btn-primary"
-                            onClick={() => { getListGrade(item) }}
-                          >
-                            {item.description}
-                          </button>
-                          {showGradeBoard && <CSVLink
-                            headers={[getHeaderAssignment(item)]}
-                            data={dataGradeBoard}
-                            filename="grade_webnc"
-                            className="link-download"
-                          >
-                            Download now
-                          </CSVLink>}
-                        </div>
-                      )
-                    })}
+                    {assignmentDetail.scores && <CSVLink
+                      headers={[getHeaderAssignment(assignmentDetail)]}
+                      data={dataGradeBoard}
+                      filename="grade_webnc"
+                      className="link-download text-center"
+                    >
+                      Download now
+                    </CSVLink>}
                   </div>
                 </div>
               </div>
