@@ -88,6 +88,8 @@ func NewHTTPHandler(
 		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("GET")
 	router.HandleFunc("/api/v1/assignment/list", Adapt(http.HandlerFunc(gradeDelivery.GetAssignmentList),
 		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("GET")
+	router.HandleFunc("/api/v1/assignment/classId", Adapt(http.HandlerFunc(gradeDelivery.GetAssignmentByClassId),
+		CheckAuth(authenticator, accountDomain)).ServeHTTP).Methods("GET")
 
 	// grade
 	router.HandleFunc("/api/v1/grade", Adapt(http.HandlerFunc(gradeDelivery.CreateGrade),

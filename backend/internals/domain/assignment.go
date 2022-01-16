@@ -11,6 +11,7 @@ type Assignment interface {
 	Update(ctx context.Context, Assignment *models.Assignment) (*models.Assignment, error)
 	GetAssignmentList(ctx context.Context, offset, limit int64) ([]*models.Assignment, error)
 	GetAssignmentById(ctx context.Context, AssignmentId string) (*models.Assignment, error)
+	GetAssignmentByClassId(ctx context.Context, classId string) ([]*models.Assignment, error)
 }
 
 type assignmentDomain struct {
@@ -52,6 +53,15 @@ func (d *assignmentDomain) GetAssignmentList(ctx context.Context, offset, limit 
 
 func (d *assignmentDomain) GetAssignmentById(ctx context.Context, AssignmentId string) (*models.Assignment, error) {
 	res, err := d.assignmentRepository.GetAssignmentById(ctx, AssignmentId)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (d *assignmentDomain) GetAssignmentByClassId(ctx context.Context, classId string) ([]*models.Assignment, error) {
+	res, err := d.assignmentRepository.GetAssignmentByClassId(ctx, classId)
 	if err != nil {
 		return nil, err
 	}

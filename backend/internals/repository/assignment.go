@@ -15,6 +15,7 @@ type Assignment interface {
 	Update(ctx context.Context, Assignment *models.Assignment) (*models.Assignment, error)
 	GetAssignmentList(ctx context.Context, offset, limit int64) ([]*models.Assignment, error)
 	GetAssignmentById(ctx context.Context, AssignmentId string) (*models.Assignment, error)
+	GetAssignmentByClassId(ctx context.Context, classId string) ([]*models.Assignment, error)
 }
 
 type AssignmentRepository struct {
@@ -85,4 +86,26 @@ func (r *AssignmentRepository) GetAssignmentById(ctx context.Context, Assignment
 	}
 
 	return &Assignment, nil
+}
+
+func (r *AssignmentRepository) GetAssignmentByClassId(ctx context.Context, classId string) ([]*models.Assignment, error) {
+	result := []*models.Assignment{}
+
+	cur, err := r.coll.Find(ctx, &models.Assignment{
+		ClassID: classId,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if cur.Err() != nil {
+		return nil, cur.Err()
+	}
+
+	if err := cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

@@ -23,6 +23,7 @@ type GradeDelivery interface {
 	UpdateAssignment(w http.ResponseWriter, r *http.Request)
 	GetAssignmentList(w http.ResponseWriter, r *http.Request)
 	GetAssignmentById(w http.ResponseWriter, r *http.Request)
+	GetAssignmentByClassId(w http.ResponseWriter, r *http.Request)
 
 	UploadGradeList(w http.ResponseWriter, r *http.Request)
 }
@@ -38,7 +39,7 @@ func NewGradeDelivery(gradeDomain domain.Grade, assignmentDomain domain.Assignme
 	return &gradeDelivery{
 		gradeDomain:      gradeDomain,
 		assignmentDomain: assignmentDomain,
-		csvDomain: csvDomain,
+		csvDomain:        csvDomain,
 		storageConfig:    storageConfig,
 	}
 }
@@ -238,6 +239,21 @@ func (d *gradeDelivery) GetAssignmentById(w http.ResponseWriter, r *http.Request
 	}
 
 	res, err := d.assignmentDomain.GetAssignmentById(context.Background(), assignmentId[0])
+	if err != nil {
+		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": err.Error()})
+		return
+	}
+	utils.ResponseWithJson(w, http.StatusOK, res)
+}
+
+func (d *gradeDelivery) GetAssignmentByClassId(w http.ResponseWriter, r *http.Request) {
+	classId := r.URL.Query()["classId"]
+	if len(classId) == 0 {
+		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": "Invalid body"})
+		return
+	}
+
+	res, err := d.assignmentDomain.GetAssignmentByClassId(context.Background(), classId[0])
 	if err != nil {
 		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": err.Error()})
 		return
