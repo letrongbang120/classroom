@@ -20,6 +20,7 @@ import AdminHeader from "./components/AdminHeader/AdminHeader";
 import UserDetails from "./components/UserDetails/UserDetails";
 import Classes from "./components/Classes/Classes";
 import ClassDetails from "./components/ClassDetails/ClassDetails";
+import Request from "./pages/Request/Request";
 
 function App() {
   return (
@@ -108,6 +109,10 @@ function App() {
           }
         />
         {/* End Admin Route */}
+
+        {/* Request Route */}
+        <Route exact path="/request/:id" element={<Request />} />
+        {/* End Request Route */}
       </Routes>
     </div>
   );
