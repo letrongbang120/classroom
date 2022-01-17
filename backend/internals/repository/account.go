@@ -18,6 +18,7 @@ type Account interface {
 	FindByEmail(ctx context.Context, email string) (*models.Account, error)
 	FindByAccountId(ctx context.Context, accountId string) (*models.Account, error)
 	UpdateInfo(ctx context.Context, accountId string, account *models.Account) error
+	UpdateInfoByEmail(ctx context.Context, email string, account *models.Account) error
 	GetAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error)
 	GetAdminAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error)
 }
@@ -67,6 +68,13 @@ func (r *accountRepository) FindByAccountId(ctx context.Context, accountId strin
 
 func (r *accountRepository) UpdateInfo(ctx context.Context, accountId string, account *models.Account) error {
 	_, err := r.coll.UpdateOne(ctx, bson.M{"account_id": accountId}, bson.M{
+		"$set": account,
+	})
+	return err
+}
+
+func (r *accountRepository) UpdateInfoByEmail(ctx context.Context, email string, account *models.Account) error {
+	_, err := r.coll.UpdateOne(ctx, bson.M{"email": email}, bson.M{
 		"$set": account,
 	})
 	return err

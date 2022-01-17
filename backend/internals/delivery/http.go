@@ -40,6 +40,8 @@ func NewHTTPHandler(
 
 	router.HandleFunc("/api/v1/sign-in", accountDelivery.SignIn).Methods("POST")
 
+	router.HandleFunc("/api/v1/forgot-password", accountDelivery.ForgotPassword).Methods("POST")
+
 	router.HandleFunc("/api/v1/sign-in/token", accountDelivery.SignInByToken).Methods("POST")
 
 	router.HandleFunc("/api/v1/account", accountDelivery.GetAccountById).Methods("GET")
