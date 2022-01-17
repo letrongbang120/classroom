@@ -87,3 +87,14 @@ export const updateDoneGrade = async (studentId, assignmentId, accountId, scores
     return false;
   }
 }
+
+export const getGrade = async (assignmentId, studentId, token) => {
+  try {
+    const { data } = await axios.get(`/grade/detail?assignmentId=${assignmentId}&studentId=${studentId}`, {
+      headers: { Authorization: token }
+    });
+    return data;
+  } catch (error) {
+    return false;
+  }
+}

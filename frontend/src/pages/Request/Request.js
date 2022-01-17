@@ -1,119 +1,202 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
-import Button from "@mui/material/Button";
-import CourseHeader from "../../components/CourseHeader/CourseHeader";
-
-const studentGrade = {
-  Name: "Danh Hoang",
-  Id: "18120304",
-  BTCN: 8,
-  BTN: 8,
-  GK: 6,
-  CK: 10,
-  Total: 8.5,
-};
-
-const markDone = true;
-
-const listRequests = [
-  {
-    fullName: "Danh Hoang",
-    studentId: "18120304",
-    currentPoint: 8,
-    expectPoint: 9,
-    content: "Diem CK cua em bi sai",
-  },
-  {
-    fullName: "Me",
-    content: "Thieu nhung cai gi?",
-  },
-  {
-    fullName: "Danh Hoang",
-    studentId: "18120304",
-    content: "Thieu nhung cai gi?Thieu nhung cai gi?",
-  },
-  {
-    fullName: "Me",
-    updatedPoint: 8.5,
-    content: "Done",
-  },
-];
+import { useNavigate, useParams } from "react-router-dom";
+import { getAssignmentById, getGrade } from "../../actions/gradeActions";
+import { createReview, getReviewList } from "../../actions/reviewAction";
+import { useForm } from "react-hook-form";
+import { getUserById } from "../../actions/userActions";
 
 export default function Request() {
+  // const [markDone, setMarkDone] = useState(false);
+  const [user, setUser] = useState({});
+  const [student, setStudent] = useState({});
+  const { studentId } = useParams();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const getStudent = async () => {
+      const res = await getUserById(studentId);
+      if (res) {
+        setStudent(res);
+      }
+      else navigate('/dashboard');
+    }
+    getStudent();
+    if (localStorage.getItem("userSigninClassroom")) {
+      setUser(JSON.parse(localStorage.getItem("userSigninClassroom")));
+    } else {
+      navigate("/login");
+    }
+  }, [navigate, studentId]);
+
+  const { assignmentId } = useParams();
+  const [assignmentDetail, setAssignmentDetail] = useState({});
+  useEffect(() => {
+    if (user.token) {
+      const getAssignment = async () => {
+        const res = await getAssignmentById(assignmentId, user.token);
+        if (res) {
+          setAssignmentDetail(res);
+        }
+      };
+      getAssignment();
+    }
+  }, [user, assignmentId]);
+
+
+  const [grade, setGrade] = useState({});
+  useEffect(() => {
+    if (user) {
+      const getGradeDetail = async () => {
+        const res = await getGrade(assignmentId, student.studentId, user.token);
+        if (res) {
+          setGrade(res);
+        }
+      }
+      getGradeDetail();
+    }
+  }, [user, assignmentId, student]);
+
+  const calcTotal = (item) => {
+    if (assignmentDetail.scores) {
+      let total = 0;
+      for (let i = 0; i < assignmentDetail.scores.length; i++) {
+        total = total + Number(assignmentDetail.scores[i].composition) * Number(item.scores[i]) / 100;
+      }
+      return total;
+    }
+  }
+
+  const [reviews, setReviews] = useState([]);
+  useEffect(() => {
+    if (user) {
+      const getReviews = async () => {
+        const res = await getReviewList(user.token);
+        if (res) {
+          let data = [];
+          for (const review of res) {
+            if (review.assignmentId === assignmentId && (review.studentId === user.studentId || review.studentId === student.studentId)) {
+              data.push(review);
+            }
+          }
+          setReviews(data);
+        }
+      }
+      getReviews();
+    }
+  }, [assignmentId, user, student]);
+
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  const onCreateReview = async (review) => {
+    const comments = [{
+      accountId: grade.accountId,
+      content: review.comment
+    }];
+    const res = await createReview(assignmentId, 50, user.accountId, grade.studentId, user.username, 0, Number(review.currentPoint), Number(review.expectedPoint), comments, user.token);
+    if (res) {
+      alert("success");
+    }
+    else {
+      alert("fail");
+    }
+  }
+
   return (
     <div>
-      {/* <CourseHeader course={course} user={user}/> */}
+      <a href={`/c/${assignmentDetail.classId}/grade`} style={{ color: "#000" }}>Back to Grade board</a>
       <div>
-        <Table className="grade-board">
+        {grade.scores && <Table className="grade-board">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Id</th>
-              <th>BTCN</th>
-              <th>BTN</th>
-              <th>GK</th>
-              <th>CK</th>
+              <th>StudentID</th>
+              <th>Scores</th>
               <th>Total</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>{studentGrade.Name}</td>
-              <td>{studentGrade.Id}</td>
-              <td>{studentGrade.BTCN}</td>
-              <td>{studentGrade.BTN}</td>
-              <td>{studentGrade.GK}</td>
-              <td>{studentGrade.CK}</td>
-              <td>{studentGrade.Total}</td>
+              <td>{grade.studentId}</td>
+              <td>
+                {grade.scores.map((item, index) => {
+                  return (
+                    <span className="score" key={index}>{item}</span>
+                  )
+                })}
+              </td>
+              <td>{calcTotal(grade)}</td>
             </tr>
           </tbody>
-        </Table>
+        </Table>}
       </div>
       <div style={{ padding: "50px 150px 0 150px" }}>
-        {listRequests.map((item, index) => (
-          <div key={index} style={{ marginBottom: "40px" }}>
-            <h5>{item.fullName}</h5>
-            <p>{item.studentId ? `StudentId: ${item.studentId}` : ""}</p>
-            <p>
-              {item.currentPoint ? `Current Point: ${item.currentPoint}; ` : ""}
-              {item.expectPoint ? `Exected Point: ${item.expectPoint}` : ""}
-            </p>
-            <p>
-              {item.updatedPoint ? `Update Point: ${item.updatedPoint}` : ""}
-            </p>
-            <p>{`Content: ${item.content}`}</p>
+        {reviews && reviews.map((item, index) => (
+          <div className="card" key={index} style={{ marginBottom: "40px" }}>
+            <div className="card-header">
+              <h5>{item.fullName}</h5>
+              <p>{item.studentId ? `StudentId: ${item.studentId}` : ""}</p>
+            </div>
+            <div className="card-body">
+              <p>
+                {item.currentPoint ? `Current Point: ${item.currentPoint}; ` : ""}
+                {item.expectPoint ? `Exected Point: ${item.expectPoint}` : ""}
+              </p>
+              <p>{item.updatedPoint ? `Update Point: ${item.updatedPoint}` : ""}</p>
+              <p>{`Content: ${item.comments[0].content}`}</p>
+            </div>
           </div>
         ))}
-        {markDone ? (
-          <Button color="error">Unmark</Button>
+        {/* { markDone ? (
+          <Button color="error" onClick={() => { setMarkDone(!markDone) }}>Unmark</Button>
         ) : (
-          <Button color="success">Mark Done</Button>
-        )}
-        <form className="row" style={{ marginTop: "15px" }}>
+          <Button color="success" onClick={() => { setMarkDone(!markDone) }}>Mark Done</Button>
+        )} */}
+        <form
+          className="row"
+          style={{ marginTop: "15px" }}
+          onSubmit={handleSubmit(onCreateReview)}
+        >
           <div className="form-group">
             <input
-              type="text"
+              type="number"
               className="form-control"
-              id="updatePoint"
-              name="updatePoint"
-              placeholder="Update Point"
+              id="currentPoint"
               style={{ marginBottom: "10px" }}
+              placeholder="Current Point"
+              // disabled={markDone}
+              {...register("currentPoint", { required: true })}
             />
+            {errors.currentPoint?.type === "required" &&
+              <span className="error">Current point is required.</span>
+            }
+            <input
+              type="number"
+              className="form-control"
+              id="expectedPoint"
+              style={{ marginBottom: "10px" }}
+              placeholder="Expected Point"
+              // disabled={markDone}
+              {...register("expectedPoint", { required: true })}
+            />
+            {errors.expectedPoint?.type === "required" &&
+              <span className="error">Expected point is required.</span>
+            }
             <input
               type="text"
               className="form-control"
               id="comment"
-              name="comment"
-              placeholder="Add your comment"
               style={{ marginBottom: "10px" }}
+              placeholder="Add your comment"
+              // disabled={markDone}
+              {...register("comment", { required: true })}
             />
+            {errors.comment?.type === "required" &&
+              <span className="error">Comment is required.</span>
+            }
           </div>
 
           <div
-            className=""
             style={{ display: "flex", justifyContent: "center" }}
           >
-            <button className="btn btn-primary">Add</button>
+            <button className="btn btn-primary" type="submit" >Add</button>
           </div>
         </form>
       </div>

@@ -111,7 +111,7 @@ function App() {
         {/* End Admin Route */}
 
         {/* Request Route */}
-        <Route exact path="/request/:id" element={<Request />} />
+        <Route exact path="/review/:assignmentId/:studentId" element={<Request />} />
         {/* End Request Route */}
       </Routes>
     </div>

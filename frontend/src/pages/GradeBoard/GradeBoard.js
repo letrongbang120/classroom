@@ -9,38 +9,6 @@ import { createGrade, getAssignmentByClassId, getGradeList, updateDoneGrade, upl
 import { Table } from "react-bootstrap";
 import { getUserById } from "../../actions/userActions";
 
-const studentGrade = {
-  BTCN: 8,
-  BTN: 8,
-  GK: 6,
-  CK: 10,
-  Total: 8.5,
-};
-
-const listRequests = [
-  {
-    fullName: "Me",
-    studentId: "18120304",
-    currentPoint: 8,
-    expectPoint: 9,
-    content: "Diem CK cua em bi sai",
-  },
-  {
-    fullName: "Teacher(Name)",
-    content: "Thieu nhung cai gi?",
-  },
-  {
-    fullName: "Me",
-    studentId: "18120304",
-    content: "Thieu nhung cai gi?Thieu nhung cai gi?",
-  },
-  {
-    fullName: "Teacher(Name)",
-    updatedPoint: 8.5,
-    content: "Done",
-  },
-];
-
 export default function GradeBoard() {
   const [course, setCourse] = useState();
   const [message, setMessage] = useState("");
@@ -396,7 +364,7 @@ export default function GradeBoard() {
                             }
                           </td>
                           <td>
-                            <button>Request</button>
+                            {(item.studentId === user.studentId || course.teacherId === user.accountId) ? <a className="btn btn-primary" href={`/review/${item.assignmentId}/${item.accountId}`}>Review</a> : ''}
                           </td>
                         </tr>
                       )
@@ -405,74 +373,6 @@ export default function GradeBoard() {
                 </tbody>
               </Table>
             }
-          </div>
-          <div>
-            <Table className="grade-board">
-              <thead>
-                <tr>
-                  <th>BTCN</th>
-                  <th>BTN</th>
-                  <th>GK</th>
-                  <th>CK</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{studentGrade.BTCN}</td>
-                  <td>{studentGrade.BTN}</td>
-                  <td>{studentGrade.GK}</td>
-                  <td>{studentGrade.CK}</td>
-                  <td>{studentGrade.Total}</td>
-                </tr>
-              </tbody>
-            </Table>
-          </div>
-          <div style={{ padding: "50px 150px 0 150px" }}>
-            {listRequests.map((item, index) => (
-              <div key={index} style={{ marginBottom: "40px" }}>
-                <h5>{item.fullName}</h5>
-                <p>{item.studentId ? `StudentId: ${item.studentId}` : ""}</p>
-                <p>{item.currentPoint ? `Current Point: ${item.currentPoint}; ` : ""}{item.expectPoint ? `Exected Point: ${item.expectPoint}` : ""}</p>
-                <p>{item.updatedPoint ? `Update Point: ${item.updatedPoint}` : ""}</p>
-                <p>{`Content: ${item.content}`}</p>
-              </div>
-            ))}
-            <form className="row" style={{ marginTop: "15px" }}>
-              <div className="form-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="currentPoint"
-                  name="currentPoint"
-                  placeholder="Your current grade"
-                  style={{ marginBottom: "10px" }}
-                />
-                <input
-                  type="text"
-                  className="form-control"
-                  id="expectedPoint"
-                  name="expectedPoint"
-                  placeholder="Your expected grade"
-                  style={{ marginBottom: "10px" }}
-                />
-                <input
-                  type="text"
-                  className="form-control"
-                  id="comment"
-                  name="comment"
-                  placeholder="Add your comment"
-                  style={{ marginBottom: "10px" }}
-                />
-              </div>
-
-              <div
-                className=""
-                style={{ display: "flex", justifyContent: "center" }}
-              >
-                <button className="btn btn-primary">Add</button>
-              </div>
-            </form>
           </div>
         </div>
       )}
