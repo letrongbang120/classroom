@@ -65,3 +65,25 @@ export const getGradeList = async (token) => {
     return false;
   }
 }
+
+export const createGrade = async (studentId, assignmentId, accountId, scores, done, token) => {
+  try {
+    const { data } = await axios.post("/grade", { studentId, assignmentId, accountId, scores, done }, {
+      headers: { Authorization: token }
+    });
+    return data;
+  } catch (error) {
+    return false;
+  }
+}
+
+export const updateDoneGrade = async (studentId, assignmentId, accountId, scores, done, token) => {
+  try {
+    const { data } = await axios.put("/grade", { studentId, assignmentId, accountId, scores, done }, {
+      headers: { Authorization: token }
+    });
+    return data;
+  } catch (error) {
+    return false;
+  }
+}
