@@ -21,6 +21,7 @@ type Account interface {
 	SignIn(ctx context.Context, req *models.Account) (*models.Account, string, error)
 	SignInByToken(ctx context.Context, req *models.Account) (*models.Account, string, error)
 	UpdateInfo(ctx context.Context, accountId string, req *models.Account) (*models.Account, error)
+	UpdateInfoByEmail(ctx context.Context, email string, req *models.Account) error
 	CheckAuth(ctx context.Context, accountId string) (*models.Account, error)
 	GetAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error)
 	GetAdminAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error)
@@ -138,6 +139,14 @@ func (d *accountDomain) UpdateInfo(ctx context.Context, accountId string, accoun
 	}
 
 	return res, nil
+}
+
+func (d *accountDomain) UpdateInfoByEmail(ctx context.Context, email string, req *models.Account) error {
+	if err := d.accountRepository.UpdateInfoByEmail(ctx, email, req); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (d *accountDomain) GetAdminAccountList(ctx context.Context, offset, limit int64) ([]*models.Account, error) {

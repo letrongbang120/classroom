@@ -1,8 +1,6 @@
 package models
 
 import (
-	"fmt"
-
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,7 +16,7 @@ type Account struct {
 	Phone     string `json:"phone,omitempty" bson:"phone,omitempty"`
 	Age       int    `json:"age,omitempty" bson:"age,omitempty"`
 	Token     string `json:"token,omitempty" bson:"token,omitempty"`
-	Block     bool   `json:"block,omitempty" bson:"block,omitempty"`
+	Block     bool   `json:"block" bson:"block,omitempty"`
 }
 
 // HashPassword : hash password using crypto
@@ -28,7 +26,6 @@ func (u *Account) HashPassword() error {
 		return err
 	}
 	u.Password = string(bytes)
-	fmt.Println(u.Password)
 	return nil
 }
 

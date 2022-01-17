@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"TKPM/common/consts"
 	"TKPM/internals/domain"
 	"TKPM/internals/models"
 	"TKPM/utils"
@@ -8,6 +9,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AccountDelivery interface {
@@ -18,17 +22,20 @@ type AccountDelivery interface {
 	GetAccountById(w http.ResponseWriter, r *http.Request)
 	GetAccountList(w http.ResponseWriter, r *http.Request)
 	GetAdminAccountList(w http.ResponseWriter, r *http.Request)
+	ForgotPassword(w http.ResponseWriter, r *http.Request)
 	UpdateInfo(w http.ResponseWriter, r *http.Request)
 	CheckAuth(accountId string) (*models.Account, error)
 }
 
 type accountDelivery struct {
 	accountDomain domain.Account
+	mail          domain.Mail
 }
 
-func NewAccountDelivery(accountDomain domain.Account) AccountDelivery {
+func NewAccountDelivery(accountDomain domain.Account, mail domain.Mail) AccountDelivery {
 	return &accountDelivery{
 		accountDomain: accountDomain,
+		mail:          mail,
 	}
 }
 
@@ -82,6 +89,34 @@ func (d *accountDelivery) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ResponseWithJson(w, http.StatusOK, res)
+}
+
+func (d *accountDelivery) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	var req models.Account
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": "Invalid body"})
+		return
+	}
+
+	newPassword := uuid.New().String()[:8]
+	bytes, err := bcrypt.GenerateFromPassword([]byte(newPassword), 14)
+	if err != nil {
+		utils.ResponseWithJson(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return
+	}
+	req.Password = string(bytes)
+	if err := d.mail.SendEmail([]string{req.Email}, consts.SubjectToForgotPassword, "This is your new password: "+newPassword); err != nil {
+		utils.ResponseWithJson(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return
+	}
+
+	if err := d.accountDomain.UpdateInfoByEmail(context.Background(), req.Email, &req); err != nil {
+		utils.ResponseWithJson(w, http.StatusBadRequest, map[string]string{"message": err.Error()})
+		return
+	}
+
+	utils.ResponseWithJson(w, http.StatusOK, nil)
 }
 
 func (d *accountDelivery) SignInByToken(w http.ResponseWriter, r *http.Request) {

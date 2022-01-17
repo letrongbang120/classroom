@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import {
-  getClass,
-  joinClass,
-} from "../../actions/classAction";
+import { getClass, joinClass } from "../../actions/classAction";
 import CourseHeader from "../../components/CourseHeader/CourseHeader";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +8,38 @@ import { CSVLink } from "react-csv";
 import { createGrade, getAssignmentByClassId, getGradeList, updateDoneGrade, uploadGradeList } from "../../actions/gradeActions";
 import { Table } from "react-bootstrap";
 import { getUserById } from "../../actions/userActions";
+
+const studentGrade = {
+  BTCN: 8,
+  BTN: 8,
+  GK: 6,
+  CK: 10,
+  Total: 8.5,
+};
+
+const listRequests = [
+  {
+    fullName: "Me",
+    studentId: "18120304",
+    currentPoint: 8,
+    expectPoint: 9,
+    content: "Diem CK cua em bi sai",
+  },
+  {
+    fullName: "Teacher(Name)",
+    content: "Thieu nhung cai gi?",
+  },
+  {
+    fullName: "Me",
+    studentId: "18120304",
+    content: "Thieu nhung cai gi?Thieu nhung cai gi?",
+  },
+  {
+    fullName: "Teacher(Name)",
+    updatedPoint: 8.5,
+    content: "Done",
+  },
+];
 
 export default function GradeBoard() {
   const [course, setCourse] = useState();
@@ -76,11 +105,10 @@ export default function GradeBoard() {
         if (res) {
           setAssignmentDetail(res);
         }
-      }
+      };
       getAssignment();
     }
   }, [user, courseId]);
-
 
   const getHeaderAssignment = (assignment) => {
     const header = [];
@@ -89,27 +117,32 @@ export default function GradeBoard() {
       header.push(`${assignment.scores[i].name}`);
     }
     return header;
-  }
+  };
 
   const [gradeFile, setGradeFile] = useState();
 
-
   const changeFileHandler = (e) => {
     setGradeFile(e.target.files[0]);
-  }
+  };
 
   const [dataGradeBoard, setDataGradeBoard] = useState([]);
   const [gradeBoard, setGradeBoard] = useState([]);
 
   const uploadGrade = async () => {
     if (assignmentDetail.assignmentId) {
-      console.log(assignmentDetail)
-      const res = await uploadGradeList(assignmentDetail.assignmentId, gradeFile, user.token)
+      console.log(assignmentDetail);
+      const res = await uploadGradeList(
+        assignmentDetail.assignmentId,
+        gradeFile,
+        user.token
+      );
       if (res) {
         alert("Your grade has been already uploaded success.");
         const resData = await getGradeList(user.token);
         if (resData) {
-          const list = resData.filter((item) => item.assignmentId === assignmentDetail.assignmentId);
+          const list = resData.filter(
+            (item) => item.assignmentId === assignmentDetail.assignmentId
+          );
           let data = [];
           for (const student of list) {
             let row = [];
@@ -123,12 +156,11 @@ export default function GradeBoard() {
           setDataGradeBoard(data);
           setGradeBoard(list);
         }
-      }
-      else {
+      } else {
         alert("Upload FAIL!!!");
       }
     }
-  }
+  };
 
   const [showTable, setShowTable] = useState(false);
   const [students, setStudents] = useState([]);
@@ -221,15 +253,16 @@ export default function GradeBoard() {
                         assignment
                       </h4>
                     </div>
-                    {assignmentDetail.scores && <CSVLink
-                      className="btn-download"
-                      data={[]}
-                      headers={[getHeaderAssignment(assignmentDetail)]}
-                      filename="grade_webnc"
-                    >
-                      Download
-                    </CSVLink>}
-
+                    {assignmentDetail.scores && (
+                      <CSVLink
+                        className="btn-download"
+                        data={[]}
+                        headers={[getHeaderAssignment(assignmentDetail)]}
+                        filename="grade_webnc"
+                      >
+                        Download
+                      </CSVLink>
+                    )}
                   </div>
 
                   <div className="col-3 text-center">
@@ -238,23 +271,20 @@ export default function GradeBoard() {
                         Upload grades of all students
                       </h4>
                     </div>
-                    {
-                      assignmentDetail && <div
-                        className="assignment-upload"
-                      >
+                    {assignmentDetail && (
+                      <div className="assignment-upload">
                         <h5>{assignmentDetail.description}</h5>
                         <input
                           className="input"
                           type="file"
-                          filetypes={'.csv'}
-                          onChange={(e) => { changeFileHandler(e) }}
+                          filetypes={".csv"}
+                          onChange={(e) => {
+                            changeFileHandler(e);
+                          }}
                         />
                       </div>
-                    }
-                    <button
-                      onClick={uploadGrade}
-                      className="btn-download"
-                    >
+                    )}
+                    <button onClick={uploadGrade} className="btn-download">
                       Add
                     </button>
                   </div>
@@ -263,14 +293,16 @@ export default function GradeBoard() {
                     <div className="d-flex justify-content-between align-items-center">
                       <h4 className="text-center">Export Grade Board</h4>
                     </div>
-                    {assignmentDetail.scores && <CSVLink
-                      headers={[getHeaderAssignment(assignmentDetail)]}
-                      data={dataGradeBoard}
-                      filename="grade_webnc"
-                      className="link-download text-center"
-                    >
-                      Download now
-                    </CSVLink>}
+                    {assignmentDetail.scores && (
+                      <CSVLink
+                        headers={[getHeaderAssignment(assignmentDetail)]}
+                        data={dataGradeBoard}
+                        filename="grade_webnc"
+                        className="link-download text-center"
+                      >
+                        Download now
+                      </CSVLink>
+                    )}
                   </div>
                 </div>
               </div>
@@ -373,6 +405,74 @@ export default function GradeBoard() {
                 </tbody>
               </Table>
             }
+          </div>
+          <div>
+            <Table className="grade-board">
+              <thead>
+                <tr>
+                  <th>BTCN</th>
+                  <th>BTN</th>
+                  <th>GK</th>
+                  <th>CK</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{studentGrade.BTCN}</td>
+                  <td>{studentGrade.BTN}</td>
+                  <td>{studentGrade.GK}</td>
+                  <td>{studentGrade.CK}</td>
+                  <td>{studentGrade.Total}</td>
+                </tr>
+              </tbody>
+            </Table>
+          </div>
+          <div style={{ padding: "50px 150px 0 150px" }}>
+            {listRequests.map((item, index) => (
+              <div key={index} style={{ marginBottom: "40px" }}>
+                <h5>{item.fullName}</h5>
+                <p>{item.studentId ? `StudentId: ${item.studentId}` : ""}</p>
+                <p>{item.currentPoint ? `Current Point: ${item.currentPoint}; ` : ""}{item.expectPoint ? `Exected Point: ${item.expectPoint}` : ""}</p>
+                <p>{item.updatedPoint ? `Update Point: ${item.updatedPoint}` : ""}</p>
+                <p>{`Content: ${item.content}`}</p>
+              </div>
+            ))}
+            <form className="row" style={{ marginTop: "15px" }}>
+              <div className="form-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  id="currentPoint"
+                  name="currentPoint"
+                  placeholder="Your current grade"
+                  style={{ marginBottom: "10px" }}
+                />
+                <input
+                  type="text"
+                  className="form-control"
+                  id="expectedPoint"
+                  name="expectedPoint"
+                  placeholder="Your expected grade"
+                  style={{ marginBottom: "10px" }}
+                />
+                <input
+                  type="text"
+                  className="form-control"
+                  id="comment"
+                  name="comment"
+                  placeholder="Add your comment"
+                  style={{ marginBottom: "10px" }}
+                />
+              </div>
+
+              <div
+                className=""
+                style={{ display: "flex", justifyContent: "center" }}
+              >
+                <button className="btn btn-primary">Add</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
