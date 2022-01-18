@@ -75,12 +75,12 @@ function CreateClass() {
           {errors.description?.type === "required" && <span className="error">Description of class is required</span>}
           <TextField
             margin="dense"
-            label="Theme"
+            label="Topic"
             type="text"
             fullWidth
             {...register("theme", { required: true })}
           />
-          {errors.theme?.type === "required" && <span className="error">Theme of class is required</span>}
+          {errors.theme?.type === "required" && <span className="error">Topic of class is required</span>}
           <TextField
             margin="dense"
             label="Room"

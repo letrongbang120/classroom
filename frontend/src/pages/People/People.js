@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
-import { CSVLink } from 'react-csv';
+import { CSVLink } from "react-csv";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
+import Button from "@mui/material/Button";
 import {
   createLink,
   getClass,
   inviteByEmail,
   joinClass,
-  updateClass
+  updateClass,
 } from "../../actions/classAction";
 import { getUserById, uploadStudentList } from "../../actions/userActions";
 import CourseHeader from "../../components/CourseHeader/CourseHeader";
@@ -189,17 +190,16 @@ export default function People() {
 
   const changeFileHandler = (e, assignmentId) => {
     setStudentsFile(e.target.files[0]);
-  }
+  };
 
   const uploadStudents = async () => {
     const res = await uploadStudentList(courseId, studentsFile, user.token);
     if (res) {
-      alert("Your list of student has been already uploaded success.")
-    }
-    else {
+      alert("Your list of student has been already uploaded success.");
+    } else {
       alert("Upload FAIL!!!");
     }
-  }
+  };
   return (
     <React.Fragment>
       {message && <span className="error">{message}</span>}
@@ -218,7 +218,7 @@ export default function People() {
                     <CSVLink
                       className="btn-download"
                       data={[[]]}
-                      headers={[['studentID', 'fullName']]}
+                      headers={[["studentID", "fullName"]]}
                       filename="class_webnc"
                       target="_blank"
                     >
@@ -235,15 +235,12 @@ export default function People() {
                     <input
                       className="input"
                       type="file"
-                      filetypes={'.csv'}
+                      filetypes={".csv"}
                       onChange={changeFileHandler}
                     />
-                    <button
-                      className="btn-download"
-                      onClick={uploadStudents}
-                    >
+                    <Button className="btn-download" onClick={uploadStudents}>
                       Add
-                    </button>
+                    </Button>
                   </div>
 
                   <div className="col-3 text-center">
@@ -274,12 +271,7 @@ export default function People() {
                         )}
                       </div>
                       <div className="mt-3 text-center">
-                        <button
-                          className="btn btn-primary"
-                          type="submit"
-                        >
-                          Send invitation
-                        </button>
+                        <Button type="submit">Send invitation</Button>
                       </div>
                     </form>
                   </div>
@@ -289,12 +281,7 @@ export default function People() {
                       <h4 className="text-right">Create Link to invite</h4>
                     </div>
                     <div style={{ marginLeft: "70px" }}>
-                      <button
-                        className="btn btn-primary"
-                        onClick={createLinkInvite}
-                      >
-                        Create
-                      </button>
+                      <Button onClick={createLinkInvite}>Create</Button>
                     </div>
                     {link && (
                       <span className="mt-3" style={{ display: "block" }}>

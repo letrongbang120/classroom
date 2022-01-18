@@ -63,7 +63,7 @@ export default function Classes() {
               <th>Class Name</th>
               <th>
                 <div>
-                  Theme
+                  Topic
                   <Button>
                     <SortIcon />
                   </Button>

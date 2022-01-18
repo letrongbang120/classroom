@@ -5,9 +5,16 @@ import CourseHeader from "../../components/CourseHeader/CourseHeader";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
 import { CSVLink } from "react-csv";
-import { createGrade, getAssignmentByClassId, getGradeList, updateDoneGrade, uploadGradeList } from "../../actions/gradeActions";
+import {
+  createGrade,
+  getAssignmentByClassId,
+  getGradeList,
+  updateDoneGrade,
+  uploadGradeList,
+} from "../../actions/gradeActions";
 import { Table } from "react-bootstrap";
 import { getUserById } from "../../actions/userActions";
+import Button from "@mui/material/Button";
 
 export default function GradeBoard() {
   const [course, setCourse] = useState();
@@ -153,16 +160,25 @@ export default function GradeBoard() {
     for (let i = 0; i < assignmentDetail.scores.length; i++) {
       scoresGrade.push(scores[index * assignmentDetail.scores.length + i]);
     }
-    const res = await createGrade(student.studentId, assignmentDetail.assignmentId, student.accountId, scoresGrade, false, user.token);
+    const res = await createGrade(
+      student.studentId,
+      assignmentDetail.assignmentId,
+      student.accountId,
+      scoresGrade,
+      false,
+      user.token
+    );
     if (!res) alert("fail");
-  }
+  };
 
   const [showGrades, setShowGrades] = useState(false);
   const onShowGrage = async () => {
     setShowGrades(!showGrades);
     const resData = await getGradeList(user.token);
     if (resData) {
-      const list = resData.filter((item) => item.assignmentId === assignmentDetail.assignmentId);
+      const list = resData.filter(
+        (item) => item.assignmentId === assignmentDetail.assignmentId
+      );
       let data = [];
       for (const student of list) {
         let row = [];
@@ -175,26 +191,37 @@ export default function GradeBoard() {
       setDataGradeBoard(data);
       setGradeBoard(list);
     }
-  }
+  };
 
   const calcTotal = (item) => {
     if (assignmentDetail) {
       let total = 0;
       for (let i = 0; i < assignmentDetail.scores.length; i++) {
-        total = total + Number(assignmentDetail.scores[i].composition) * Number(item.scores[i]) / 100;
+        total =
+          total +
+          (Number(assignmentDetail.scores[i].composition) *
+            Number(item.scores[i])) /
+            100;
       }
       return total;
     }
-  }
+  };
 
   const setDoneGrade = async (grade) => {
-    const res = await updateDoneGrade(grade.studentId, grade.assignmentId, grade.accountId, grade.scores, true, user.token);
+    const res = await updateDoneGrade(
+      grade.studentId,
+      grade.assignmentId,
+      grade.accountId,
+      grade.scores,
+      true,
+      user.token
+    );
     if (!res) {
-      alert("fail")
+      alert("fail");
     } else {
-      alert("OK")
+      alert("OK");
     }
-  }
+  };
   return (
     <React.Fragment>
       {message && <span className="error">{message}</span>}
@@ -209,9 +236,15 @@ export default function GradeBoard() {
                     <div className="d-flex justify-content-between align-items-center">
                       <h4 className="text-right">Edit grade an assignments</h4>
                     </div>
-                    <button type="button" className="btn btn-primary">
-                      <Link to={`/c/${courseId}/grade/add`}>Edit</Link>
-                    </button>
+
+                    <Button>
+                      <Link
+                        to={`/c/${courseId}/grade/add`}
+                        style={{ color: "#1976D2", fontWeight: 500 }}
+                      >
+                        Edit
+                      </Link>
+                    </Button>
                   </div>
 
                   <div className="col-3 text-center">
@@ -252,9 +285,9 @@ export default function GradeBoard() {
                         />
                       </div>
                     )}
-                    <button onClick={uploadGrade} className="btn-download">
+                    <Button onClick={uploadGrade} className="btn-download">
                       Add
-                    </button>
+                    </Button>
                   </div>
 
                   <div className="col-3">
@@ -276,25 +309,35 @@ export default function GradeBoard() {
               </div>
             )}
           </div>
-          {course.teacherId === user.accountId && <button onClick={() => { setShowTable(!showTable) }}>{showTable ? 'Hide' : 'Show'} table</button>}
-          {(showTable && assignmentDetail.scores) && <div>
-            <Table>
-              <thead>
-                <tr>
-                  <th>Index</th>
-                  <th>StudentId</th>
-                  <th>Name</th>
-                  {assignmentDetail.scores.map(item => {
-                    return (
-                      <th key={item.name}>{item.name} ({item.composition}%)</th>
-                    )
-                  })}
-                  <th>More</th>
-                </tr>
-              </thead>
-              <tbody>
-                {
-                  students.map((item, index) => {
+          {course.teacherId === user.accountId && (
+            <Button
+              onClick={() => {
+                setShowTable(!showTable);
+              }}
+            >
+              {showTable ? "Hide" : "Show"} table
+            </Button>
+          )}
+          {showTable && assignmentDetail.scores && (
+            <div>
+              <Table>
+                <thead>
+                  <tr>
+                    <th>Index</th>
+                    <th>StudentId</th>
+                    <th>Name</th>
+                    {assignmentDetail.scores.map((item) => {
+                      return (
+                        <th key={item.name}>
+                          {item.name} ({item.composition}%)
+                        </th>
+                      );
+                    })}
+                    <th>More</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {students.map((item, index) => {
                     return (
                       <tr key={item.studentId}>
                         <td>{index + 1}</td>
@@ -306,26 +349,35 @@ export default function GradeBoard() {
                               <input
                                 type="number"
                                 onChange={(e) => {
-                                  scores[index * assignmentDetail.scores.length + i] = Number(e.target.value);
+                                  scores[
+                                    index * assignmentDetail.scores.length + i
+                                  ] = Number(e.target.value);
                                 }}
                               />
                             </td>
-                          )
+                          );
                         })}
                         <td>
-                          <button onClick={() => { submitGrade(item, index) }}>Add</button>
+                          <button
+                            onClick={() => {
+                              submitGrade(item, index);
+                            }}
+                          >
+                            Add
+                          </button>
                         </td>
                       </tr>
-                    )
-                  })
-                }
-              </tbody>
-            </Table>
-          </div>
-          }
-          <button onClick={onShowGrage}>{showGrades ? 'Hide' : 'Show'} grade</button>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            </div>
+          )}
+          <Button onClick={onShowGrage}>
+            {showGrades ? "Hide" : "Show"} grade
+          </Button>
           <div>
-            {showGrades &&
+            {showGrades && (
               <Table className="grade-board">
                 <thead>
                   <tr>
@@ -344,35 +396,59 @@ export default function GradeBoard() {
                         <tr key={index}>
                           <td>{index + 1}</td>
                           <td>{item?.studentId}</td>
-                          <td>{item?.scores.map((score, index) => {
-                            return <span key={index} className="score">{score}</span>
-                          })}</td>
                           <td>
-                            <span className="score">
-                              {calcTotal(item)}
-                            </span>
+                            {item?.scores.map((score, index) => {
+                              return (
+                                <span key={index} className="score">
+                                  {score}
+                                </span>
+                              );
+                            })}
                           </td>
                           <td>
-                            {item.done ?
-                              <span className="score" onClick={() => { console.log(item) }}>Ok</span> :
+                            <span className="score">{calcTotal(item)}</span>
+                          </td>
+                          <td>
+                            {item.done ? (
+                              <span
+                                className="score"
+                                onClick={() => {
+                                  console.log(item);
+                                }}
+                              >
+                                Ok
+                              </span>
+                            ) : (
                               <button
                                 className="btn btn-success mt-0"
-                                onClick={() => { setDoneGrade(item) }}
+                                onClick={() => {
+                                  setDoneGrade(item);
+                                }}
                               >
                                 Done
                               </button>
-                            }
+                            )}
                           </td>
                           <td>
-                            {(item.studentId === user.studentId || course.teacherId === user.accountId) ? <a className="btn btn-primary" href={`/review/${item.assignmentId}/${item.accountId}`}>Review</a> : ''}
+                            {item.studentId === user.studentId ||
+                            course.teacherId === user.accountId ? (
+                              <a
+                                className="btn btn-primary"
+                                href={`/review/${item.assignmentId}/${item.accountId}`}
+                              >
+                                Review
+                              </a>
+                            ) : (
+                              ""
+                            )}
                           </td>
                         </tr>
-                      )
-                    else return <tr key={index}></tr>
+                      );
+                    else return <tr key={index}></tr>;
                   })}
                 </tbody>
               </Table>
-            }
+            )}
           </div>
         </div>
       )}

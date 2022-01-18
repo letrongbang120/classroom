@@ -236,7 +236,7 @@ export default function CoursePage() {
 
                       <div className="col-md-12">
                         <label htmlFor="Theme" className="labels">
-                          Theme
+                          Topic
                         </label>
                         <input
                           type="text"

@@ -17,9 +17,8 @@ export default function Request() {
       const res = await getUserById(studentId);
       if (res) {
         setStudent(res);
-      }
-      else navigate('/dashboard');
-    }
+      } else navigate("/dashboard");
+    };
     getStudent();
     if (localStorage.getItem("userSigninClassroom")) {
       setUser(JSON.parse(localStorage.getItem("userSigninClassroom")));
@@ -42,7 +41,6 @@ export default function Request() {
     }
   }, [user, assignmentId]);
 
-
   const [grade, setGrade] = useState({});
   useEffect(() => {
     if (user) {
@@ -51,7 +49,7 @@ export default function Request() {
         if (res) {
           setGrade(res);
         }
-      }
+      };
       getGradeDetail();
     }
   }, [user, assignmentId, student]);
@@ -60,11 +58,15 @@ export default function Request() {
     if (assignmentDetail.scores) {
       let total = 0;
       for (let i = 0; i < assignmentDetail.scores.length; i++) {
-        total = total + Number(assignmentDetail.scores[i].composition) * Number(item.scores[i]) / 100;
+        total =
+          total +
+          (Number(assignmentDetail.scores[i].composition) *
+            Number(item.scores[i])) /
+            100;
       }
       return total;
     }
-  }
+  };
 
   const [reviews, setReviews] = useState([]);
   useEffect(() => {
@@ -74,76 +76,114 @@ export default function Request() {
         if (res) {
           let data = [];
           for (const review of res) {
-            if (review.assignmentId === assignmentId && (review.studentId === user.studentId || review.studentId === student.studentId)) {
+            if (
+              review.assignmentId === assignmentId &&
+              (review.studentId === user.studentId ||
+                review.studentId === student.studentId)
+            ) {
               data.push(review);
             }
           }
           setReviews(data);
         }
-      }
+      };
       getReviews();
     }
-  }, [assignmentId, user, student]);
+  }, [assignmentId, user, student, reviews]);
 
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const onCreateReview = async (review) => {
-    const comments = [{
-      accountId: grade.accountId,
-      content: review.comment
-    }];
-    const res = await createReview(assignmentId, 50, user.accountId, grade.studentId, user.username, 0, Number(review.currentPoint), Number(review.expectedPoint), comments, user.token);
+    const comments = [
+      {
+        accountId: grade.accountId,
+        content: review.comment,
+      },
+    ];
+    const res = await createReview(
+      assignmentId,
+      50,
+      user.accountId,
+      grade.studentId,
+      user.username,
+      0,
+      Number(review.currentPoint),
+      Number(review.expectedPoint),
+      comments,
+      user.token
+    );
     if (res) {
       alert("success");
-    }
-    else {
+    } else {
       alert("fail");
     }
-  }
+  };
 
   return (
     <div>
-      <a href={`/c/${assignmentDetail.classId}/grade`} style={{ color: "#000" }}>Back to Grade board</a>
+      <a
+        href={`/c/${assignmentDetail.classId}/grade`}
+        style={{ color: "#000" }}
+      >
+        Back to Grade board
+      </a>
       <div>
-        {grade.scores && <Table className="grade-board">
-          <thead>
-            <tr>
-              <th>StudentID</th>
-              <th>Scores</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{grade.studentId}</td>
-              <td>
-                {grade.scores.map((item, index) => {
-                  return (
-                    <span className="score" key={index}>{item}</span>
-                  )
-                })}
-              </td>
-              <td>{calcTotal(grade)}</td>
-            </tr>
-          </tbody>
-        </Table>}
+        {grade.scores && (
+          <Table className="grade-board">
+            <thead>
+              <tr>
+                <th>StudentID</th>
+                <th>Scores</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{grade.studentId}</td>
+                <td>
+                  {grade.scores.map((item, index) => {
+                    return (
+                      <span className="score" key={index}>
+                        {item}
+                      </span>
+                    );
+                  })}
+                </td>
+                <td>{calcTotal(grade)}</td>
+              </tr>
+            </tbody>
+          </Table>
+        )}
       </div>
       <div style={{ padding: "50px 150px 0 150px" }}>
-        {reviews && reviews.map((item, index) => (
-          <div className="card" key={index} style={{ marginBottom: "40px" }}>
-            <div className="card-header">
-              <h5>{item.fullName}</h5>
-              <p>{item.studentId ? `StudentId: ${item.studentId}` : ""}</p>
+        {reviews &&
+          reviews.map((item, index) => (
+            <div className="card" key={index} style={{ marginBottom: "40px" }}>
+              <div className="card-header">
+                <h5>{item.fullName}</h5>
+                {item.accountId === studentId && (
+                  <p>{`StudentId: ${item.studentId}`}</p>
+                )}
+              </div>
+              <div className="card-body">
+                <p>
+                  {item.currentPoint
+                    ? `Current Point: ${item.currentPoint}; `
+                    : ""}
+                  {item.expectPoint ? `Exected Point: ${item.expectPoint}` : ""}
+                </p>
+                <p>
+                  {item.updatedPoint
+                    ? `Update Point: ${item.updatedPoint}`
+                    : ""}
+                </p>
+                <p>{`Content: ${item.comments[0].content}`}</p>
+              </div>
             </div>
-            <div className="card-body">
-              <p>
-                {item.currentPoint ? `Current Point: ${item.currentPoint}; ` : ""}
-                {item.expectPoint ? `Exected Point: ${item.expectPoint}` : ""}
-              </p>
-              <p>{item.updatedPoint ? `Update Point: ${item.updatedPoint}` : ""}</p>
-              <p>{`Content: ${item.comments[0].content}`}</p>
-            </div>
-          </div>
-        ))}
+          ))}
         {/* { markDone ? (
           <Button color="error" onClick={() => { setMarkDone(!markDone) }}>Unmark</Button>
         ) : (
@@ -155,30 +195,34 @@ export default function Request() {
           onSubmit={handleSubmit(onCreateReview)}
         >
           <div className="form-group">
-            <input
-              type="number"
-              className="form-control"
-              id="currentPoint"
-              style={{ marginBottom: "10px" }}
-              placeholder="Current Point"
-              // disabled={markDone}
-              {...register("currentPoint", { required: true })}
-            />
-            {errors.currentPoint?.type === "required" &&
-              <span className="error">Current point is required.</span>
-            }
-            <input
-              type="number"
-              className="form-control"
-              id="expectedPoint"
-              style={{ marginBottom: "10px" }}
-              placeholder="Expected Point"
-              // disabled={markDone}
-              {...register("expectedPoint", { required: true })}
-            />
-            {errors.expectedPoint?.type === "required" &&
-              <span className="error">Expected point is required.</span>
-            }
+            {user.accountId === studentId && (
+              <div>
+                <input
+                  type="number"
+                  className="form-control"
+                  id="currentPoint"
+                  style={{ marginBottom: "10px" }}
+                  placeholder="Current Point"
+                  // disabled={markDone}
+                  {...register("currentPoint", { required: true })}
+                />
+                {errors.currentPoint?.type === "required" && (
+                  <span className="error">Current point is required.</span>
+                )}
+                <input
+                  type="number"
+                  className="form-control"
+                  id="expectedPoint"
+                  style={{ marginBottom: "10px" }}
+                  placeholder="Expected Point"
+                  // disabled={markDone}
+                  {...register("expectedPoint", { required: true })}
+                />
+                {errors.expectedPoint?.type === "required" && (
+                  <span className="error">Expected point is required.</span>
+                )}
+              </div>
+            )}
             <input
               type="text"
               className="form-control"
@@ -188,15 +232,15 @@ export default function Request() {
               // disabled={markDone}
               {...register("comment", { required: true })}
             />
-            {errors.comment?.type === "required" &&
+            {errors.comment?.type === "required" && (
               <span className="error">Comment is required.</span>
-            }
+            )}
           </div>
 
-          <div
-            style={{ display: "flex", justifyContent: "center" }}
-          >
-            <button className="btn btn-primary" type="submit" >Add</button>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <button className="btn btn-primary" type="submit">
+              Add
+            </button>
           </div>
         </form>
       </div>
