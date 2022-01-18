@@ -168,7 +168,8 @@ export default function GradeBoard() {
       false,
       user.token
     );
-    if (!res) alert("fail");
+    if (res) alert("success");
+    else alert("fail");
   };
 
   const [showGrades, setShowGrades] = useState(false);
@@ -201,7 +202,7 @@ export default function GradeBoard() {
           total +
           (Number(assignmentDetail.scores[i].composition) *
             Number(item.scores[i])) /
-            100;
+          100;
       }
       return total;
     }
@@ -431,7 +432,7 @@ export default function GradeBoard() {
                           </td>
                           <td>
                             {item.studentId === user.studentId ||
-                            course.teacherId === user.accountId ? (
+                              course.teacherId === user.accountId ? (
                               <a
                                 className="btn btn-primary"
                                 href={`/review/${item.assignmentId}/${item.accountId}`}

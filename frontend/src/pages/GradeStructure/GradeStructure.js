@@ -82,7 +82,7 @@ export default function GradeStructure() {
     else {
       const res = await createAssignment(name, grades, courseId, user.token);
       if (res) {
-        console.log(res);
+        navigate(`/c/${res.classId}`)
       }
       else {
         alert('Create assignment fail. Something was wrong!!!');

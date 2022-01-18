@@ -88,13 +88,24 @@ export const uploadStudentList = async (classId, file, token) => {
   }
 }
 
-export const banUser = async (ban, token) => {
+export const banUser = async (ban, username, studentId, phone, age, token) => {
   try {
+    const ageNumber = Number(age);
     console.log(ban)
-    const { data } = await axios.put('/account', { block: !ban }, {
+    const { data } = await axios.put('/account', { username, studentId, phone, age: ageNumber, block: ban }, {
       headers: { Authorization: token }
     })
     console.log(data)
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+export const forgotPassword = async (email) => {
+  try {
+    console.log(email)
+    const { data } = await axios.post('/forgot-password', email);
     return true;
   } catch (error) {
     return false;

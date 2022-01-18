@@ -22,7 +22,11 @@ function Login() {
   const onSubmitHandler = async (userInfo) => {
     const result = await signin(userInfo.email, userInfo.password);
     if (result) {
-      navigate("/dashboard");
+      if (result.block) {
+        navigate("/blocked")
+      } else {
+        navigate("/dashboard");
+      }
     }
     else {
       setMessage("Wrong email or password");
@@ -113,7 +117,7 @@ function Login() {
                 Sign up
               </Link>
             </small>
-            <Link to="/" style={{ color: "#2583ff" }}>Forgot your password?</Link>
+            <Link to="/forgot-password" style={{ color: "#2583ff" }}>Forgot your password?</Link>
           </div>
           <div style={{ textAlign: "center" }}>
             <GoogleLogin

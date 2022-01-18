@@ -21,6 +21,8 @@ import UserDetails from "./components/UserDetails/UserDetails";
 import Classes from "./components/Classes/Classes";
 import ClassDetails from "./components/ClassDetails/ClassDetails";
 import Request from "./pages/Request/Request";
+import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
+import BlockedPage from "./pages/BlockedPage/BlockedPage";
 
 function App() {
   return (
@@ -41,6 +43,8 @@ function App() {
             </React.Fragment>
           }
         />
+        <Route path="/blocked" element={<BlockedPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/c/:courseId/grade/add" element={<GradeStructure />} />
         <Route
           path="/u/:userId"

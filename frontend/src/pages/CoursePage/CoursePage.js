@@ -184,7 +184,9 @@ export default function CoursePage() {
                       return <div key={item.name}>{item.name}: {item.composition}%</div>
                     })}
                   </button> :
-                    <a className="btn btn-primary" href={`/c/${courseId}/grade/add`}>Add Grade Stucture</a>
+                    <div>
+                      {course.teacherId === user.accountId && <a className="btn btn-primary" href={`/c/${courseId}/grade/add`}>Add Grade Stucture</a>}
+                    </div>
                   }
 
                 </div>
