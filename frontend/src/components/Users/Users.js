@@ -33,17 +33,8 @@ export default function Users() {
     getUsers();
   }, []);
 
-  const banUserHandler = async (user, token) => {
-    const res = await banUser(true, user.username, user.studentId, user.phone, user.age, token);
-    if (res) {
-      alert("Success")
-    }
-    else {
-      alert("Fail");
-    }
-  }
-  const unbanUserHandler = async (token) => {
-    const res = await banUser(false, token);
+  const banUserHandler = async (user) => {
+    const res = await banUser(user.accountId);
     if (res) {
       alert("Success")
     }
@@ -129,13 +120,12 @@ export default function Users() {
                     </td>
                     <td>
                       {user.block ?
-                        <button
-                          className="btn btn-success"
-                          onClick={() => { banUserHandler(user, admin.token) }}
-                        >Unban</button>
+                        <span
+                          className="error"
+                        >Banned</span>
                         : <button
                           className="btn btn-danger"
-                          onClick={() => { unbanUserHandler(user, admin.token) }}
+                          onClick={() => { banUserHandler(user, admin.token) }}
                         >Ban</button>
                       }
                     </td>

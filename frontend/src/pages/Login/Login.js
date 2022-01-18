@@ -22,6 +22,7 @@ function Login() {
   const onSubmitHandler = async (userInfo) => {
     const result = await signin(userInfo.email, userInfo.password);
     if (result) {
+      console.log(result)
       if (result.block) {
         navigate("/blocked")
       } else {

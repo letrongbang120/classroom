@@ -4,7 +4,7 @@ export const signin = async (email, password) => {
   try {
     const { data } = await axios.post("/sign-in", { email, password });
     localStorage.setItem("userSigninClassroom", JSON.stringify(data));
-    return true;
+    return data;
   } catch (error) {
     return false;
   }
@@ -88,13 +88,9 @@ export const uploadStudentList = async (classId, file, token) => {
   }
 }
 
-export const banUser = async (ban, username, studentId, phone, age, token) => {
+export const banUser = async (accountId) => {
   try {
-    const ageNumber = Number(age);
-    console.log(ban)
-    const { data } = await axios.put('/account', { username, studentId, phone, age: ageNumber, block: ban }, {
-      headers: { Authorization: token }
-    })
+    const { data } = await axios.put('/account/m', { accountId, block: true });
     console.log(data)
     return true;
   } catch (error) {
