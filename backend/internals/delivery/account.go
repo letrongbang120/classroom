@@ -159,6 +159,7 @@ func (d *accountDelivery) SignInByToken(w http.ResponseWriter, r *http.Request) 
 		Email:     res.Email,
 		Phone:     res.Phone,
 		Age:       res.Age,
+		Block:     res.Block,
 	})
 }
 
@@ -185,6 +186,7 @@ func (d *accountDelivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		Email:     res.Email,
 		Phone:     res.Phone,
 		Age:       res.Age,
+		Block:     res.Block,
 	})
 }
 
