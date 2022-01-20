@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { getClassById } from "../../actions/userActions";
+import { getClassById, getUserById } from "../../actions/userActions";
 
 import ClassCard from "../../components/ClassCard/ClassCard";
 
@@ -31,6 +31,17 @@ function Dashboard() {
     }
     func();
   }, [user, navigate]);
+
+  // useEffect(()=>{
+  //   if (user.accountId){
+  //     const getUser=async()=>{
+  //       const res=await getUserById(user.accountId);
+  //       if (res.block){
+  //         navigate('')
+  //       }
+  //     }
+  //   }
+  // },[])
 
   return (
     <>

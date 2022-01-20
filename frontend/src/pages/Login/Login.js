@@ -3,7 +3,7 @@ import "../../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import { useForm } from "react-hook-form";
 import { GoogleLogin } from "react-google-login";
 import { useNavigate, Link } from 'react-router-dom'
-import { signin, signInByEmail } from "../../actions/userActions";
+import { signin, signInByEmail, signout } from "../../actions/userActions";
 
 function Login() {
   const {

@@ -19,7 +19,7 @@ export default function ForgotPassword() {
 
   return (
     <div>
-      <form onSubmit={handleSubmit(onGetPassword)}>
+      <form onSubmit={handleSubmit(onGetPassword)} className='text-center mt-5'>
         <div>
           <label>User email: </label>
           <input

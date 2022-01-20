@@ -22,3 +22,8 @@ a:hover {
   padding: 5px;
   border-radius: 40%;
 }
+
+.login {
+  color: rgb(83, 163, 255) !important;
+  font-style: italic;
+}
