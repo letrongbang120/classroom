@@ -16,7 +16,8 @@ import { Table } from "react-bootstrap";
 import { getUserById } from "../../actions/userActions";
 import Button from "@mui/material/Button";
 
-export default function GradeBoard() {
+export default function GradeBoard(props) {
+  const [notifications, setNotifications] = useState([]);
   const [course, setCourse] = useState();
   const [message, setMessage] = useState("");
   const { courseId } = useParams();
@@ -30,6 +31,13 @@ export default function GradeBoard() {
       navigate("/login");
     }
   }, [navigate]);
+
+  useEffect(() => {
+    props.socket?.on("getNotification", (data) => {
+      console.log(data);
+      setNotifications((prev) => [...prev, data]);
+    });
+  }, [props]);
 
   useEffect(() => {
     const func = async () => {
@@ -223,6 +231,25 @@ export default function GradeBoard() {
       alert("OK");
     }
   };
+
+  const countNoti = (id) => {
+    if (notifications) {
+      if (user.accountId === course.teacherId) {
+        let t = 0;
+        for (const notification of notifications) {
+          console.log(notification);
+          if (notification.senderName === id) {
+            t = t + 1;
+          }
+        }
+        return t;
+      }
+      else
+        return notifications.length;
+    }
+    return 0;
+  }
+
   return (
     <React.Fragment>
       {message && <span className="error">{message}</span>}
@@ -437,7 +464,7 @@ export default function GradeBoard() {
                                 className="btn btn-primary"
                                 href={`/review/${item.assignmentId}/${item.accountId}`}
                               >
-                                Review
+                                Review {(notifications && countNoti(item.accountId) !== 0) ? <span className="notificate">{countNoti(item.accountId)}</span> : ''}
                               </a>
                             ) : (
                               ""

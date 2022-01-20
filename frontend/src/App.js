@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { io } from 'socket.io-client'
 
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
@@ -25,6 +26,24 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import BlockedPage from "./pages/BlockedPage/BlockedPage";
 
 function App() {
+  const socket = useRef();
+  const [user, setUser] = useState({});
+  useEffect(() => {
+    if (localStorage.getItem("userSigninClassroom")) {
+      setUser(JSON.parse(localStorage.getItem("userSigninClassroom")));
+    }
+  }, []);
+
+  useEffect(() => {
+    socket.current = io("http://localhost:5000");
+  }, []);
+
+  useEffect(() => {
+    if (user.accountId) {
+      socket.current?.emit("newUser", user.accountId);
+    }
+
+  }, [socket, user]);
   return (
     <div className="App">
       <Routes>
@@ -33,7 +52,7 @@ function App() {
         <Route exact path="/" element={<Home />} />
         <Route exact path="/c/:courseId" element={<CoursePage />} />
         <Route exact path="/r/:courseId" element={<People />} />
-        <Route exact path="/c/:courseId/grade" element={<GradeBoard />} />
+        <Route exact path="/c/:courseId/grade" element={<GradeBoard socket={socket.current} />} />
         <Route
           path="/dashboard"
           element={
@@ -115,7 +134,7 @@ function App() {
         {/* End Admin Route */}
 
         {/* Request Route */}
-        <Route exact path="/review/:assignmentId/:studentId" element={<Request />} />
+        <Route exact path="/review/:assignmentId/:studentId" element={<Request socket={socket.current} />} />
         {/* End Request Route */}
       </Routes>
     </div>

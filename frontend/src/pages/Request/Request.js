@@ -5,8 +5,9 @@ import { getAssignmentById, getGrade } from "../../actions/gradeActions";
 import { createReview, getReviewList } from "../../actions/reviewAction";
 import { useForm } from "react-hook-form";
 import { getUserById } from "../../actions/userActions";
+import { getClass } from "../../actions/classAction";
 
-export default function Request() {
+export default function Request(props) {
   // const [markDone, setMarkDone] = useState(false);
   const [user, setUser] = useState({});
   const [student, setStudent] = useState({});
@@ -30,7 +31,7 @@ export default function Request() {
   const { assignmentId } = useParams();
   const [assignmentDetail, setAssignmentDetail] = useState({});
   useEffect(() => {
-    if (user.token) {
+    if (user.token && assignmentId) {
       const getAssignment = async () => {
         const res = await getAssignmentById(assignmentId, user.token);
         if (res) {
@@ -40,6 +41,19 @@ export default function Request() {
       getAssignment();
     }
   }, [user, assignmentId]);
+
+  const [teacherId, setTeacherId] = useState('');
+  useEffect(() => {
+    if (assignmentDetail.classId && user.token) {
+      const getTeacher = async () => {
+        const res = await getClass(assignmentDetail.classId, user.token);
+        if (res) {
+          setTeacherId(res.teacherId);
+        }
+      }
+      getTeacher();
+    }
+  }, [assignmentDetail, user])
 
   const [grade, setGrade] = useState({});
   useEffect(() => {
@@ -62,7 +76,7 @@ export default function Request() {
           total +
           (Number(assignmentDetail.scores[i].composition) *
             Number(item.scores[i])) /
-            100;
+          100;
       }
       return total;
     }
@@ -116,6 +130,20 @@ export default function Request() {
       user.token
     );
     if (res) {
+      if (user.accountId !== studentId) {
+        props.socket.emit("sendNotification", {
+          senderName: user.accountId,
+          receiverName: studentId,
+          message: review.comment
+        });
+      }
+      else {
+        props.socket.emit("sendNotification", {
+          senderName: studentId,
+          receiverName: teacherId,
+          message: review.comment
+        });
+      }
       alert("success");
     } else {
       alert("fail");
